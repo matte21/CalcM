@@ -307,14 +307,6 @@ sameThing(P1, P2) :- type(P1, Point), type(P2, Point), spaciallyIntersects(P1, P
     
 
 
-    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#accessibleSeats -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#accessibleSeats">
-        <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Feature"/>
-    </owl:NamedIndividual>
-    
-
-
     <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#accessibleToilet -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#accessibleToilet">
@@ -342,6 +334,14 @@ sameThing(P1, P2) :- type(P1, Point), type(P2, Point), spaciallyIntersects(P1, P
     <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#heating -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#heating">
+        <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Feature"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#isAccessible -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#isAccessible">
         <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Feature"/>
     </owl:NamedIndividual>
     
