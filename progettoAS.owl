@@ -228,9 +228,9 @@ above the local reference ellipsoid).</rdfs:comment>
     
 
 
-    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasAvailableSeats -->
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#availableSeats -->
 
-    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasAvailableSeats">
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#availableSeats">
         <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneClassRoom#StudyRoom"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#nonNegativeInteger"/>
     </owl:DatatypeProperty>
@@ -263,9 +263,9 @@ above the local reference ellipsoid).</rdfs:comment>
     
 
 
-    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#isCurrentlyOpen -->
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#isOpen -->
 
-    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#isCurrentlyOpen">
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#isOpen">
         <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneClassRoom#StudyRoom"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
     </owl:DatatypeProperty>
