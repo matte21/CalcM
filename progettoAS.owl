@@ -272,6 +272,14 @@ above the local reference ellipsoid).</rdfs:comment>
     
 
 
+    <!-- http://www.w3.org/ns/locn#addressId -->
+
+    <rdf:Description rdf:about="http://www.w3.org/ns/locn#addressId">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/ns/locn#addressArea"/>
+    </rdf:Description>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
