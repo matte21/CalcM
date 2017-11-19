@@ -142,10 +142,11 @@ above the local reference ellipsoid).</rdfs:comment>
     
 
 
-    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#available -->
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasChairSensor -->
 
-    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#available">
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasChairSensor">
         <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Seat"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#ChairSensor"/>
     </owl:ObjectProperty>
     
 
@@ -188,19 +189,29 @@ above the local reference ellipsoid).</rdfs:comment>
     
 
 
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasTableSensor -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasTableSensor">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Seat"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#TableSensor"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasValue -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasValue">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensor"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensorValue"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#inUniversity -->
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#inUniversity">
         <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneClassRoom#StudyRoom"/>
         <rdfs:range rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#University"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#isOpen -->
-
-    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#isOpen">
-        <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneClassRoom#StudyRoom"/>
     </owl:ObjectProperty>
     
 
@@ -220,6 +231,24 @@ above the local reference ellipsoid).</rdfs:comment>
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#seat">
         <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Table"/>
         <rdfs:range rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Seat"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#seatState -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#seatState">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Seat"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#SeatState"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#studyRoomState -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#studyRoomState">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneClassRoom#StudyRoom"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#StudyRoomState"/>
     </owl:ObjectProperty>
     
 
@@ -275,6 +304,15 @@ above the local reference ellipsoid).</rdfs:comment>
     
 
 
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#closesAt -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#closesAt">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneClassRoom#StudyRoom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTimeStamp"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasCapacity -->
 
     <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasCapacity">
@@ -297,6 +335,15 @@ above the local reference ellipsoid).</rdfs:comment>
 
     <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#hasUniversityID">
         <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#University"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#opensAt -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#opensAt">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneClassRoom#StudyRoom"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTimeStamp"/>
     </owl:DatatypeProperty>
     
 
@@ -326,6 +373,26 @@ above the local reference ellipsoid).</rdfs:comment>
     
 
 
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensor"/>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensorValue -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensorValue"/>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#ChairSensor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#ChairSensor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensor"/>
+    </owl:Class>
+    
+
+
     <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Feature -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Feature"/>
@@ -346,11 +413,23 @@ above the local reference ellipsoid).</rdfs:comment>
     
 
 
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#SeatState -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#SeatState"/>
+    
+
+
     <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#StudyRoomFeature -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#StudyRoomFeature">
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Feature"/>
     </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#StudyRoomState -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#StudyRoomState"/>
     
 
 
@@ -364,6 +443,14 @@ above the local reference ellipsoid).</rdfs:comment>
 
     <owl:Class rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#TableFeature">
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#Feature"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#TableSensor -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#TableSensor">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensor"/>
     </owl:Class>
     
 
@@ -439,6 +526,22 @@ sameThing(P1, P2) :- type(P1, Point), type(P2, Point), spaciallyIntersects(P1, P
     
 
 
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#available -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#available">
+        <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#SeatState"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#closed -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#closed">
+        <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#StudyRoomState"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#computer -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#computer">
@@ -463,10 +566,42 @@ sameThing(P1, P2) :- type(P1, Point), type(P2, Point), spaciallyIntersects(P1, P
     
 
 
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#nothingDetected -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#nothingDetected">
+        <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensorValue"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#occupied -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#occupied">
+        <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#SeatState"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#open -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#open">
+        <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#StudyRoomState"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#powerOutlet -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#powerOutlet">
         <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#TableFeature"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#somethingDetected -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#somethingDetected">
+        <rdf:type rdf:resource="http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#BinarySensorValue"/>
     </owl:NamedIndividual>
     
 
