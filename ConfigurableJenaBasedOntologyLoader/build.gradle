@@ -17,10 +17,9 @@ mainClassName = "driver.MainClass"
 
 distZip {
 	baseName = 'ontologyLoader'
-/******************************************* 
     into(baseName) {
         from '.'
-        include 'ontology/*'
+        include 'README_to_put_in_executable(zip).txt'
+        rename '(.*)_.*_.*_.*_.*.txt','$1.txt' 
     }
- *******************************************/
 }
