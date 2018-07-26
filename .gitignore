@@ -1,2 +1,6 @@
 catalog-v001.xml
+<<<<<<< HEAD
 ~.*\.class
+=======
+~.*\.pptx?
+>>>>>>> branch 'master' of https://github.com/matte21/CalcM.git

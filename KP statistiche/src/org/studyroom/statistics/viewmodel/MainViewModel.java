@@ -67,5 +67,4 @@ public class MainViewModel extends ViewModel {
 	public Collection<String> getUniversities(){
 		return getStudyRooms().stream().map(StudyRoom::getUniversity).distinct().collect(Collectors.toList());
 	}
-
 }
