@@ -62,8 +62,33 @@ public class StudyRoom implements Serializable {
 	public void setCloseTime(Date closeTime){
 		this.closeTime=closeTime;
 	}
+	public Table getTable(String URI){
+		for (Table t : tables)
+			if (t.getURI().equals(URI))
+				return t;
+		return null;
+	}
+	public Seat getSeat(String URI){
+		for (Table t : tables){
+			Seat s=t.getSeat(URI);
+			if (s!=null)
+				return s;
+		}
+		return null;
+	}
+	/*public Seat getSeat2(String URI){	//si è dimostrata meno efficiente se 
+		return Arrays.stream(tables).flatMap(t->Arrays.stream(t.getSeats())).filter(s->s.getURI().equals(URI)).findFirst().orElse(null);
+	}*/
 	@Override
 	public String toString(){
 		return URI;
+	}
+	@Override
+	public boolean equals(Object o){
+		return o instanceof StudyRoom && ((StudyRoom)o).getURI().equals(URI);
+	}
+	@Override
+	public int hashCode(){
+		return URI.hashCode();
 	}
 }

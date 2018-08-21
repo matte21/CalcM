@@ -40,4 +40,12 @@ public class Seat implements Serializable {
 	public String toString(){
 		return URI;
 	}
+	@Override
+	public boolean equals(Object o){
+		return o instanceof Seat && ((Seat)o).getURI().equals(URI);
+	}
+	@Override
+	public int hashCode(){
+		return URI.hashCode();
+	}
 }

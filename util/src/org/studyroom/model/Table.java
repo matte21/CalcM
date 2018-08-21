@@ -25,8 +25,22 @@ public class Table implements Serializable {
 	public Seat[] getSeats(){
 		return Arrays.copyOf(seats,seats.length);
 	}
+	public Seat getSeat(String URI){
+		for (Seat s : seats)
+			if (s.getURI().equals(URI))
+				return s;
+		return null;
+	}
 	@Override
 	public String toString(){
 		return URI;
+	}
+	@Override
+	public boolean equals(Object o){
+		return o instanceof Table && ((Table)o).getURI().equals(URI);
+	}
+	@Override
+	public int hashCode(){
+		return URI.hashCode();
 	}
 }

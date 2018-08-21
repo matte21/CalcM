@@ -1,8 +1,9 @@
-package org.studyroom.statistics.view;
+package org.studyroom.statistics.view.fx;
 
 import java.beans.*;
 import java.lang.reflect.*;
 import java.util.*;
+import javafx.application.*;
 import javafx.beans.property.*;
 import javafx.beans.property.adapter.*;
 import javafx.collections.*;
@@ -140,6 +141,20 @@ public class BindingUtil {
 			throw new IllegalArgumentException(e);
 		}
 	}
+	public static <K,V> void bindMapOneWay(MapProperty<K,V> fxProp, String prop, Object viewModel){
+		try {
+			fxProp.bind(new ReadOnlyJavaBeanMapProperty<K,V>(viewModel,prop));
+		} catch (NoSuchMethodException e){
+			throw new IllegalArgumentException(e);
+		}
+	}
+	public static <K,V> void bindMapOneWay(ObjectProperty<ObservableMap<K,V>> fxProp, String prop, Object viewModel){
+		try {
+			fxProp.bind(new ReadOnlyJavaBeanMapProperty<K,V>(viewModel,prop));
+		} catch (NoSuchMethodException e){
+			throw new IllegalArgumentException(e);
+		}
+	}
 	public static <T> ObservableList<T> observableList(String prop, Object viewModel){
 		try {
 			return new ReadOnlyJavaBeanListProperty<T>(viewModel,prop);
@@ -179,6 +194,14 @@ public class BindingUtil {
 			throw new IllegalArgumentException(e);
 		}
 	}
+	private static void onFXPlatform(Runnable r){
+		if (Platform.isFxApplicationThread())
+			System.out.println("Ci siamo già");//XXX
+		if (Platform.isFxApplicationThread())
+			r.run();
+		else
+			Platform.runLater(r);
+	}
 	public static class ReadOnlyJavaBeanObjectProperty<T> extends ObjectPropertyBase<T> {
 		private Object bean;
 		private String name;
@@ -203,6 +226,8 @@ public class BindingUtil {
 				bean.getClass().getMethod("addPropertyChangeListener",PropertyChangeListener.class).invoke(bean,new PropertyChangeListener(){
 					@Override
 					public void propertyChange(PropertyChangeEvent e){
+						if (!e.getPropertyName().equals(name))
+							return;
 						try {
 							load((T)e.getNewValue());
 						} catch (ClassCastException ex){
@@ -215,9 +240,11 @@ public class BindingUtil {
 			}
 		}
 		private void load(T o){
-			System.err.println(o);
-			set(o);
-			fireValueChangedEvent();
+			System.out.println(name+": To FX platform...");//XXX
+			onFXPlatform(()->{
+				set(o);
+				fireValueChangedEvent();
+			});
 		}
 		@Override
 		public Object getBean(){
@@ -252,6 +279,8 @@ public class BindingUtil {
 					@SuppressWarnings("unchecked")
 					@Override
 					public void propertyChange(PropertyChangeEvent e){
+						if (!e.getPropertyName().equals(name))
+							return;
 						try {
 							if (e instanceof IndexedPropertyChangeEvent){
 								IndexedPropertyChangeEvent ie=(IndexedPropertyChangeEvent)e;
@@ -273,8 +302,11 @@ public class BindingUtil {
 			} catch (NoSuchMethodException|IllegalAccessException|IllegalArgumentException|InvocationTargetException|SecurityException e){}
 		}
 		private void load(List<T> l){
-			super.set(FXCollections.observableArrayList(l));
-			fireValueChangedEvent();
+			System.out.println(name+": To FX platform...");//XXX
+			onFXPlatform(()->{
+				set(FXCollections.observableArrayList(l));
+				fireValueChangedEvent();
+			});
 		}
 		@Override
 		public Object getBean(){
@@ -309,6 +341,8 @@ public class BindingUtil {
 					@SuppressWarnings("unchecked")
 					@Override
 					public void propertyChange(PropertyChangeEvent e){
+						if (!e.getPropertyName().equals(name))
+							return;
 						try {
 							if (e instanceof IndexedPropertyChangeEvent){
 								//use oldValue as key and newValue as value, the index is useless in maps
@@ -329,8 +363,11 @@ public class BindingUtil {
 			} catch (NoSuchMethodException|IllegalAccessException|IllegalArgumentException|InvocationTargetException|SecurityException e){}
 		}
 		private void load(Map<K,V> m){
-			super.set(FXCollections.observableMap(m));
-			fireValueChangedEvent();
+			System.out.println(name+": To FX platform...");//XXX
+			onFXPlatform(()->{
+				set(FXCollections.observableMap(m));
+				fireValueChangedEvent();
+			});
 		}
 		@Override
 		public Object getBean(){
