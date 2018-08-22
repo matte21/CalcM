@@ -35,7 +35,10 @@ public abstract class Persistence extends Observable {
 	public Collection<String> getStudyRoomsNames(){
 		return getStudyRooms().stream().map(StudyRoom::getName).collect(Collectors.toList());
 	}
-	public String getStudyRoomsName(String URI){
+	public Collection<String> getStudyRoomsURIs(){
+		return getStudyRooms().stream().map(StudyRoom::getURI).collect(Collectors.toList());
+	}
+	public String getStudyRoomName(String URI){
 		return getStudyRooms().stream().filter(r->r.getURI().equals(URI)).map(StudyRoom::getName).findFirst().orElseThrow(()->new IllegalArgumentException("URI "+URI+" not found"));
 	}
 }

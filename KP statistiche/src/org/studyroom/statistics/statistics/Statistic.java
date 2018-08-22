@@ -44,15 +44,30 @@ public abstract class Statistic implements Observer {
 			IniFile.write(new File(d,s.getClass().getSimpleName()+".ini"),s.saveStatisticData());
 	}
 	
+
 	public abstract String getName();
 	public abstract String getValuesLabel();
-	public abstract Map<String,Value> getValues();
-	public abstract Collection<String> getCategories();
+	public abstract Map<String,Value> getValues(String studyRoomURI);
+	//public abstract Collection<String> getCategories();
 	protected abstract void loadStatisticData(Map<String,Map<String,String>> data);
 	protected abstract Map<String,Map<String,String>> saveStatisticData();
 	
 	private List<CategoryChangedListener> catListeners=new LinkedList<>();
 	private List<StatisticValueChangedListener> valListeners=new LinkedList<>();
+	private boolean additive, singleValue;
+	protected Statistic(boolean additive, boolean singleValue){
+		this.additive=additive;
+		this.singleValue=singleValue;
+	}
+	public boolean isAdditive(){
+		return additive;
+	}
+	public boolean isSingleValue(){
+		return singleValue;
+	}
+	public boolean accept(Aggregator a){
+		return !((a.isAdditive()&& !additive)||(a.isComparison()&& !singleValue));
+	}
 	public void addCategoryListener(CategoryChangedListener cat){
 		catListeners.add(cat);
 	}
@@ -85,7 +100,7 @@ public abstract class Statistic implements Observer {
 	public String toString(){
 		return getName();
 	}
-	public static final class Value {
+	public static final class Value implements Comparable<Value> {
 		private final int full,partial;
 		Value(int full, int partial){
 			this.full=full;
@@ -102,6 +117,11 @@ public abstract class Statistic implements Observer {
 		/**@return the value considering all occupied seats */
 		public int getTotal(){
 			return full+partial;
+		}
+		@Override
+		public int compareTo(Value o){
+			int r=getTotal()-o.getTotal();
+			return r!=0?r:getFull()-o.getFull();
 		}
 	}
 	public static interface CategoryChangedListener {

@@ -47,13 +47,17 @@ public class Histogram extends StackedBarChart<String,Number> {
 		BindingUtil.bindMapOneWay(dp,valProp,viewModel);
 		BindingUtil.bindStringOneWay(tp,tilesProp,viewModel);
 		//ObservableList<Series<String,Number>> data=FXCollections.observableArrayList(dp.get().entrySet().stream().map(e->new Series<String,Number>(e.getKey(),FXCollections.observableArrayList(e.getValue().stream().map(v->new Data<>(e.getKey(),v)).collect(Collectors.toList())))).collect(Collectors.toList()));
+		ObservableList<String> cat=FXCollections.observableArrayList(cp.get());
+		cp.addListener((l,o,n)->{
+			cat.clear();
+			cat.addAll(cp.get());
+		});
 		ObservableList<Series<String,Number>> data=toSeries(dp.get());
 		dp.addListener((l,o,n)->{
 			data.clear();
 			data.addAll(toSeries(dp.get()));
-			
 		});
-		return new Histogram(viewModel,valProp,catProp,tilesProp,dp,cp,tp,data);
+		return new Histogram(viewModel,valProp,catProp,tilesProp,dp,cp,tp,cat,data);
 	}
 	private static ObservableList<Series<String,Number>> toSeries(Map<String,List<Number>> data){
 		Collection<Map.Entry<String,List<Number>>> c=data.entrySet();
@@ -67,8 +71,8 @@ public class Histogram extends StackedBarChart<String,Number> {
 		}
 		return FXCollections.observableList(l);
 	}
-	private Histogram(Object viewModel, String valProp, String catProp, String tilesProp, ObjectProperty<ObservableMap<String,List<Number>>> valuesProperty, ObjectProperty<ObservableList<String>> categoriesProperty, StringProperty tilesProperty, ObservableList<Series<String,Number>> data){
-		super(new CategoryAxis(categoriesProperty.get()),new NumberAxis(),data);
+	private Histogram(Object viewModel, String valProp, String catProp, String tilesProp, ObjectProperty<ObservableMap<String,List<Number>>> valuesProperty, ObjectProperty<ObservableList<String>> categoriesProperty, StringProperty tilesProperty, ObservableList<String> cat, ObservableList<Series<String,Number>> data){
+		super(new CategoryAxis(cat),new NumberAxis(),data);
 		this.valProp=valProp;
 		this.catProp=catProp;
 		this.tilesProp=tilesProp;

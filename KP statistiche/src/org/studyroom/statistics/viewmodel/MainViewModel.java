@@ -14,6 +14,8 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	private Visualization visualization=Visualization.BOTH;
 	private CategoryChangedListener catListener=(s,o,n)->firePropertyChange("categories",null,getCategories());
 	private StatisticValueChangedListener valListener=(s,c,v)->firePropertyChange("data",null,getData());
+	private Aggregator[] aggregators={Aggregator.COMPARISON,Aggregator.SUM,Aggregator.AVERAGE};
+	private Aggregator aggregator;
 	
 	public MainViewModel(){
 		setStatistic(Statistic.get(Statistic.getStatisticsNames().stream().findFirst().get()));
@@ -31,6 +33,8 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 		//firePropertyChange("selectedStudyRooms",selectedSR,selected);
 		selectedSR=selected;
 		updateGraphicTitle();
+		firePropertyChange("categories",null,getCategories());
+		firePropertyChange("data",null,getData());
 	}
 	@Override
 	public String getGraphicTitle(){
@@ -39,22 +43,21 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	private void updateGraphicTitle(){
 		if (statistic==null || selectedSR.size()==0)
 			return;
-		String title=statistic.getName()+" - "+(selectedSR.size()==1?selectedSR.get(0).getName():"media")+" ("+selectedSR.get(0).getUniversity()+")";
+		String title=statistic.getName()+" - "+(selectedSR.size()==1?selectedSR.get(0).getName():aggregator.getName())+" ("+selectedSR.get(0).getUniversity()+")";
 		firePropertyChange("graphicTitle",graphicTitle,title);
 		graphicTitle=title;
 		System.out.println(title);	////XXX//////////
 	}
 	@Override
 	public Map<String,List<Double>> getData(){
+		Map<String,Value> g=selectedSR.size()==1?statistic.getValues(selectedSR.get(0).getURI()):selectedSR.stream().map(StudyRoom::getURI).map(statistic::getValues).collect(aggregator);
 		Map<String,List<Double>> m=new TreeMap<>();
-		statistic.getValues().forEach((c,v)->m.put(c,toGraphicData(v)));
+		g.forEach((c,v)->m.put(c,toGraphicData(v)));
 		return m;
 	}
 	@Override
 	public List<String> getCategories(){
-		List<String> l=new ArrayList<>();
-		statistic.getValues().forEach((c,v)->l.add(c));
-		return new ArrayList<>(statistic.getValues().keySet());
+		return new ArrayList<>(getData().keySet());
 	}
 	private List<Double> toGraphicData(Statistic.Value v){
 		List<Double> d=new ArrayList<>(2);
@@ -63,6 +66,12 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 		if (visualization.showPartial())
 			d.add((double)v.getPartial());
 		return d;
+	}
+	private Aggregator getAggregator(){
+		for (Aggregator a : aggregators)
+			if (statistic.accept(a))
+				return a;
+		throw new IllegalStateException("No aggregator found for selected statistic");
 	}
 	@Override
 	public String getTilesLabel(){
@@ -85,6 +94,7 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 		statistic=st;
 		statistic.addListeners(catListener,valListener);
 		//firePropertyChange("statistic",n,getStatistic());
+		aggregator=getAggregator();
 		firePropertyChange("data",null,getData());
 		firePropertyChange("tilesLabel",l,getTilesLabel());
 		updateGraphicTitle();
