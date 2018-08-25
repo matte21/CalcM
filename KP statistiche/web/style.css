@@ -1,0 +1,59 @@
+﻿body,html{
+	text-align:center;
+	background-color:beige;
+}
+#menu{
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;	/*senza questo scompare*/
+	background-color: #333333;
+}
+#menu li{
+	float:left;
+}
+#menu a{
+	display: block;
+	color: white;
+	text-align: center;
+	padding: 12px 25px;
+	text-decoration: none;
+}
+#menu a:hover{
+	background-color:black;
+}
+svg{
+	overflow:hidden;
+}
+svg text{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:9pt;
+	stroke:none;
+	fill:#000000;/*alcuni browser accettano solo colori in forma #------ per fill*/
+}
+text.num{
+		text-anchor:end;
+}
+text.cat{
+		text-anchor:middle;
+}
+rect.background{
+	stroke:none;
+	fill:#ffffff;
+}
+rect.axis{
+	stroke:none;
+	fill:#333333;
+}
+rect.step{
+	stroke:none;
+	fill:#cccccc;
+}
+rect.graph1{
+	stroke:none;
+	fill:#3366cc;
+}
+rect.graph2{
+	stroke:none;
+	fill:#ff9933;
+}

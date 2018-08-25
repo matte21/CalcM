@@ -30,6 +30,8 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 		return selectedSR;
 	}
 	private void setSelectedStudyRooms(List<StudyRoom> selected){
+		if (selected.size()==0)
+			throw new IllegalArgumentException("Empty selection");
 		//firePropertyChange("selectedStudyRooms",selectedSR,selected);
 		selectedSR=selected;
 		updateGraphicTitle();

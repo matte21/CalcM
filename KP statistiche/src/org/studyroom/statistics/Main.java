@@ -14,7 +14,8 @@ public class Main {
 	public static void main(String[] args){
 		MockKP.getInstance();
 		Statistic.loadStatistics();
-		NanoHTTPD s=new WebServer();
+		NanoHTTPD s=WebServer.getInstance();
+		WebServer.setViewModelClass(MainViewModel.class);
 		try{
 			s.start(0,false);	//default:true
 		} catch (IOException e){
