@@ -1,0 +1,27 @@
+apply plugin: 'eclipse'
+apply plugin: 'java'
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+	mavenCentral()
+	
+	// Used for local jars
+	flatDir {
+		dirs 'libs'
+	}
+}
+
+dependencies {
+	// https://mvnrepository.com/artifact/org.jdom/jdom2
+	compile group: 'org.jdom', name: 'jdom2', version: '2.0.5'
+	
+	// SIB API local dependencies 
+	compile name: 'sofia_kp', ext: 'jar'
+	
+	testCompile 'junit:junit:4.12'
+	
+	// Dependencies for logging: log4j2
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'
+}
+
