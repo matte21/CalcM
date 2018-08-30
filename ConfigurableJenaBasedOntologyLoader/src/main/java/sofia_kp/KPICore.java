@@ -39,6 +39,7 @@ public class KPICore implements iKPIC, iKPIC_subscribeHandler2,  iKPIC_subscribe
 	public static int      S_PORT     = -1;
 	public static String   S_SMART_SPACE_NAME=null;
 
+
 	private int protocol_version = 0;
 
 	public int getProtocol_version() {
@@ -193,8 +194,7 @@ public class KPICore implements iKPIC, iKPIC_subscribeHandler2,  iKPIC_subscribe
 
 	}//public KpCore(String HOST,int port)
 
-	public KPICore ()
-	{
+	public KPICore() {
 		this.HOST="";
 		this.PORT=0;
 		this.SMART_SPACE_NAME=SMART_SPACE_NAME = "";
@@ -1364,7 +1364,7 @@ public class KPICore implements iKPIC, iKPIC_subscribeHandler2,  iKPIC_subscribe
 
 
 
-				if(msg.contains("<SSAP_message>") && msg.contains(  "</SSAP_message>") )
+				if(msg.contains("<SSAP_message>") && msg.contains( "</SSAP_message>") )
 				{	//The first message is not an event but just the confirmation message!!!
 					if(this.xmlTools.isSubscriptionConfirmed(msg))
 					{
