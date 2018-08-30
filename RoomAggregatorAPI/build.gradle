@@ -1,0 +1,25 @@
+apply plugin: 'eclipse'
+apply plugin: 'java'
+
+
+repositories {
+	mavenCentral()
+	
+	// Used for local jars
+	flatDir {
+		dirs 'libs'
+	}
+}
+
+
+dependencies {
+	// https://mvnrepository.com/artifact/org.jdom/jdom2
+	compile group: 'org.jdom', name: 'jdom2', version: '2.0.5'
+	
+	// SIB API local dependencies 
+	compile name: 'sofia_kp', ext: 'jar' 
+
+	// Dependencies for logging: log4j2
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
+  	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'
+}
