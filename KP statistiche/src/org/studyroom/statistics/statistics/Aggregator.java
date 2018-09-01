@@ -40,7 +40,7 @@ public abstract class Aggregator implements Collector<Map<String,Statistic.Value
 	}
 	@Override
 	public final Supplier<Map<String,Statistic.Value>> supplier(){
-		return TreeMap<String,Statistic.Value>::new;
+		return LinkedHashMap<String,Statistic.Value>::new;
 	}
 	@Override
 	public BiConsumer<Map<String,Statistic.Value>,Map<String,Statistic.Value>> accumulator(){
@@ -81,14 +81,14 @@ public abstract class Aggregator implements Collector<Map<String,Statistic.Value
 				Value va=accumulator.getOrDefault(k,new Value(0,0));
 				accumulator.put(k,new Value(v.getFull()+va.getFull(),v.getPartial()+va.getPartial()));
 			});
-			int na=accumulator.containsKey(K_TOTAL)?accumulator.get(K_TOTAL).getFull():0;
-			int n=m.containsKey(K_TOTAL)?m.get(K_TOTAL).getFull():1;
+			int na=accumulator.containsKey(K_TOTAL)?(int)accumulator.get(K_TOTAL).getFull():0;
+			int n=m.containsKey(K_TOTAL)?(int)m.get(K_TOTAL).getFull():1;
 			accumulator.put(K_TOTAL,new Value(na+n,0));
 		}
 		@Override
 		public Function<Map<String,Statistic.Value>,Map<String,Statistic.Value>> finisher(){
 			return m->{
-				int n=m.containsKey(K_TOTAL)?m.get(K_TOTAL).getFull():1;
+				int n=m.containsKey(K_TOTAL)?(int)m.get(K_TOTAL).getFull():1;
 				m.remove(K_TOTAL);
 				m.forEach((k,v)->m.put(k,new Value(v.getFull()/n,v.getPartial()/n)));
 				return m;

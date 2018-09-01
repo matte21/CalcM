@@ -12,18 +12,19 @@ import org.studyroom.statistics.viewmodel.*;
 
 public class Main {
 	public static void main(String[] args){
-		MockKP.getInstance();
+		MockKP.getInstance();	//initialize persistence
 		Statistic.loadStatistics();
-		NanoHTTPD s=WebServer.getInstance();
+		MockKP.getInstance().start();
 		WebServer.setViewModelClass(MainViewModel.class);
+		NanoHTTPD s=WebServer.getInstance();
 		try{
 			s.start(0,false);	//default:true
 		} catch (IOException e){
 			e.printStackTrace();
 		}
 		if (SystemTray.isSupported()){
-			new Thread(()->App.launch(App.class)).start();
 			App.setViewModelClass(MainViewModel.class);
+			new Thread(()->App.launch(App.class)).start();
 			TrayIcon ic=new TrayIcon(new BufferedImage(30,30,BufferedImage.TYPE_INT_RGB),"StudyRoom - Visualizza statistiche");
 			ic.setImageAutoSize(true);
 			ic.addActionListener(e->App.show());

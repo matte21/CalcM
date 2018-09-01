@@ -12,14 +12,17 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	private List<StudyRoom> selectedSR=new ArrayList<>();
 	private String graphicTitle;
 	private Visualization visualization=Visualization.BOTH;
-	private CategoryChangedListener catListener=(s,o,n)->firePropertyChange("categories",null,getCategories());
-	private StatisticValueChangedListener valListener=(s,c,v)->firePropertyChange("data",null,getData());
-	private Aggregator[] aggregators={Aggregator.COMPARISON,Aggregator.SUM,Aggregator.AVERAGE};
+	private final CategoryChangedListener catListener=(s,o,n)->{cacheValid=false; firePropertyChange("categories",null,getCategories());};
+	private final StatisticValueChangedListener valListener=(s,c,v)->{cacheValid=false; firePropertyChange("data",null,getData());};
+	private final Aggregator[] aggregators={Aggregator.COMPARISON,Aggregator.SUM,Aggregator.AVERAGE};
 	private Aggregator aggregator;
+	private Map<String,List<Double>> cacheData;
+	private boolean init,cacheValid;
 	
 	public MainViewModel(){
 		setStatistic(Statistic.get(Statistic.getStatisticsNames().stream().findFirst().get()));
 		selectStudyRoom(DEFAULT_SR,getStudyRooms().stream().findFirst().get().getUniversity());
+		init=true;
 	}
 	
 	private Collection<StudyRoom> getStudyRooms(){
@@ -34,6 +37,7 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 			throw new IllegalArgumentException("Empty selection");
 		//firePropertyChange("selectedStudyRooms",selectedSR,selected);
 		selectedSR=selected;
+		cacheValid=false;
 		updateGraphicTitle();
 		firePropertyChange("categories",null,getCategories());
 		firePropertyChange("data",null,getData());
@@ -52,10 +56,15 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	}
 	@Override
 	public Map<String,List<Double>> getData(){
-		Map<String,Value> g=selectedSR.size()==1?statistic.getValues(selectedSR.get(0).getURI()):selectedSR.stream().map(StudyRoom::getURI).map(statistic::getValues).collect(aggregator);
-		Map<String,List<Double>> m=new TreeMap<>();
-		g.forEach((c,v)->m.put(c,toGraphicData(v)));
-		return m;
+		if (!init)
+			return Collections.emptyMap();
+		if (!cacheValid){
+			cacheValid=true;
+			Map<String,Value> g=selectedSR.size()==1?statistic.getValues(selectedSR.get(0).getURI()):selectedSR.stream().map(StudyRoom::getURI).map(statistic::getValues).collect(aggregator);
+			cacheData=new LinkedHashMap<>();
+			g.forEach((c,v)->cacheData.put(c,toGraphicData(v)));
+		}
+		return cacheData;
 	}
 	@Override
 	public List<String> getCategories(){
@@ -97,8 +106,10 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 		statistic.addListeners(catListener,valListener);
 		//firePropertyChange("statistic",n,getStatistic());
 		aggregator=getAggregator();
-		firePropertyChange("data",null,getData());
+		cacheValid=false;
+		firePropertyChange("categories",null,getData());
 		firePropertyChange("tilesLabel",l,getTilesLabel());
+		firePropertyChange("data",null,getData());
 		updateGraphicTitle();
 	}
 	
@@ -119,6 +130,7 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	public void selectVisualization(String option){
 		//String v=getVisualization();
 		visualization=Visualization.valueOf(option.toUpperCase());	//can throw IllegalArgumentException
+		cacheValid=false;
 		//firePropertyChange("visualization",v,getVisualization());
 		firePropertyChange("data",null,getData());
 	}

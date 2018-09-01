@@ -19,14 +19,10 @@ public class GraphicPage extends HTMLPage {
 				"<!DOCTYPE html>\n"+
 				"<html>\n"+
 				"	<head>\n"+
-				"		<meta content=\"text/html; charset=utf-8\" http-equiv=\"Content-Type\">\n"+
+				"		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n"+
 				"		<title>StudyRoom - statistiche</title>\n"+
 				"		<link rel=\"stylesheet\" type=\"text/css\" href=\"rsc/style.css\">\n"+
-				"		<script type=\"text/javascript\" src=\"rsc/cookie.js\"></script>\n"+
 				"		<script type=\"text/javascript\" src=\"rsc/script.js\"></script>\n"+
-				"		<script type=\"text/javascript\">\n"+
-				"			kSessionID=\""+SESSION_ID+"\";\n"+
-				"		</script>\n"+
 				"	</head>\n"+
 				"	<body>\n"+
 				"		<ul id=\"menu\">\n");
@@ -81,7 +77,7 @@ public class GraphicPage extends HTMLPage {
 					"			<rect class=\"step\" x=\"100\" y=\""+h+"\" width=\""+(W-200)+"\" height=\"1\"></rect>\n"+
 					"			<text class=\"num\" x=\"86\" y=\""+(h+5.4)+"\">"+i+"</text>\n");
 		}
-		double scaleX=(W-200)/data.size();
+		double scaleX=(W-200)/Math.max(data.size(),1);
 		int i=0;
 		for (Map.Entry<String,List<Double>> c : data.entrySet()){
 			html.append("			<text class=\"cat\" x=\""+(100+scaleX*(i+0.5))+"\" y=\""+(H-28)+"\">"+c.getKey()+"</text>\n");

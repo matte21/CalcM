@@ -12,12 +12,8 @@ public class MockKP {
 		return instance;
 	}
 	private final StudyRoom[] sr;
-	//private final KPPersistence persistence;
+	private final KPPersistence persistence;
 	public MockKP(){
-		KPPersistence persistence=new KPPersistence(new StudyRoom[]{
-				new StudyRoom("sr1",new Table[0],"Aula studio lab4","Alma Mater Studiorum"),
-				new StudyRoom("sr2",new Table[0],"Aula studio biblioteca","Alma Mater Studiorum")
-		});
 		sr=new StudyRoom[]{
 			new StudyRoom("sr1",new Table[]{
 					new Table("sr1t1",new Seat[]{
@@ -53,26 +49,32 @@ public class MockKP {
 							new Seat("sr2t1s8")
 					})
 				},"Aula studio biblioteca","Alma Mater Studiorum")};
-		/*sr[0].getTables()[0].getSeats()[1].setChairAvailable(false);
-		sr[0].getTables()[0].getSeats()[1].setDeskAvailable(false);
-		sr[0].getTables()[0].getSeats()[2].setChairAvailable(false);
-		sr[0].getTables()[0].getSeats()[2].setDeskAvailable(false);
-		sr[0].getTables()[0].getSeats()[4].setChairAvailable(false);
-		sr[0].getTables()[0].getSeats()[4].setDeskAvailable(false);
-		sr[0].getTables()[0].getSeats()[5].setChairAvailable(false);
-		sr[0].getTables()[0].getSeats()[5].setDeskAvailable(false);
-		sr[0].getTables()[1].getSeats()[4].setChairAvailable(false);
-		sr[0].getTables()[1].getSeats()[4].setDeskAvailable(false);
-		sr[1].getTables()[0].getSeats()[1].setChairAvailable(false);
-		sr[1].getTables()[0].getSeats()[1].setDeskAvailable(false);
-		sr[1].getTables()[0].getSeats()[2].setChairAvailable(false);
-		sr[1].getTables()[0].getSeats()[2].setDeskAvailable(false);
-		sr[1].getTables()[0].getSeats()[3].setChairAvailable(false);
-		sr[1].getTables()[0].getSeats()[3].setDeskAvailable(false);
-		sr[1].getTables()[0].getSeats()[4].setChairAvailable(false);
-		sr[1].getTables()[0].getSeats()[4].setDeskAvailable(false);
-		sr[1].getTables()[0].getSeats()[5].setChairAvailable(false);
-		sr[1].getTables()[0].getSeats()[5].setDeskAvailable(false);*/
+		persistence=new KPPersistence(new StudyRoom[]{
+				new StudyRoom("sr1",sr[0].getCapacity(),"Aula studio lab4","Alma Mater Studiorum"),
+				new StudyRoom("sr2",sr[1].getCapacity(),"Aula studio biblioteca","Alma Mater Studiorum")
+		});
+	}
+	public void start(){
+		initSeat(0,0,1,CHAIR_OCCUPIED);
+		initSeat(0,0,1,DESK_OCCUPIED);
+		initSeat(0,0,2,CHAIR_OCCUPIED);
+		initSeat(0,0,2,DESK_OCCUPIED);
+		initSeat(0,0,4,CHAIR_OCCUPIED);
+		initSeat(0,0,4,DESK_OCCUPIED);
+		initSeat(0,0,5,CHAIR_OCCUPIED);
+		initSeat(0,0,5,DESK_OCCUPIED);
+		initSeat(0,1,4,CHAIR_OCCUPIED);
+		initSeat(0,1,4,DESK_OCCUPIED);
+		initSeat(1,0,1,CHAIR_OCCUPIED);
+		initSeat(1,0,1,DESK_OCCUPIED);
+		initSeat(1,0,2,CHAIR_OCCUPIED);
+		initSeat(1,0,2,DESK_OCCUPIED);
+		initSeat(1,0,3,CHAIR_OCCUPIED);
+		initSeat(1,0,3,DESK_OCCUPIED);
+		initSeat(1,0,4,CHAIR_OCCUPIED);
+		initSeat(1,0,4,DESK_OCCUPIED);
+		initSeat(1,0,5,CHAIR_OCCUPIED);
+		initSeat(1,0,5,DESK_OCCUPIED);
 		Timer t=new Timer(true);
 		t.schedule(new TimerTask(){
 			@Override
@@ -95,6 +97,32 @@ public class MockKP {
 				persistence.notifyChange(s.getURI(),t.getURI(),r.getURI(),c,o);
 				System.out.println("Posti occupati: "+(sr[0].getCapacity()-sr[0].getAvailableSeats())+", "+(sr[1].getCapacity()-sr[1].getAvailableSeats()));
 			}
-		},0,1000);
+		},1000,1000);
+	}
+	/**unchecked input parameters*/
+	private void initSeat(int isr, int it, int is, SeatStateChange state){
+		StudyRoom sr=this.sr[isr];
+		Table t=sr.getTables()[it];
+		Seat s=t.getSeats()[is];
+		SeatStateChange other=null;
+		switch (state){
+		case CHAIR_FREE:
+			s.setChairAvailable(true);
+			other=s.isDeskAvailable()?DESK_FREE:DESK_OCCUPIED;
+			break;
+		case CHAIR_OCCUPIED:
+			s.setChairAvailable(false);
+			other=s.isDeskAvailable()?DESK_FREE:DESK_OCCUPIED;
+			break;
+		case DESK_FREE:
+			s.setDeskAvailable(true);
+			other=s.isChairAvailable()?CHAIR_FREE:CHAIR_OCCUPIED;
+			break;
+		case DESK_OCCUPIED:
+			s.setDeskAvailable(false);
+			other=s.isChairAvailable()?CHAIR_FREE:CHAIR_OCCUPIED;
+			break;
+		}
+		persistence.initState(s.getURI(),t.getURI(),sr.getURI(),state,other);
 	}
 }

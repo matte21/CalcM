@@ -1,6 +1,7 @@
 package org.studyroom.model;
 
 import java.io.*;
+import java.time.*;
 import java.util.*;
 
 public class StudyRoom implements Serializable {
@@ -8,11 +9,17 @@ public class StudyRoom implements Serializable {
 	private String URI,name,university;
 	private Table[] tables;
 	private String[] features;
-	//private int capacity,availableSeats;
+	private int capacity,availableSeats;
 	private boolean open;
-	private Date openTime,closeTime;
+	private LocalDateTime openTime,closeTime;
 	public StudyRoom(String URI, Table[] tables, String name, String university, String...features){
 		this(URI,tables);
+		this.name=name;
+		this.university=university;
+		this.features=features;
+	}
+	public StudyRoom(String URI, int capacity, String name, String university, String...features){
+		this(URI,capacity);
 		this.name=name;
 		this.university=university;
 		this.features=features;
@@ -20,8 +27,11 @@ public class StudyRoom implements Serializable {
 	public StudyRoom(String URI, Table[] tables){
 		this.URI=URI;
 		this.tables=tables;
-		//capacity=(int)Arrays.stream(tables).flatMap(t->Arrays.stream(t.getSeats())).count();
-		//availableSeats=(int)Arrays.stream(tables).flatMap(t->Arrays.stream(t.getSeats())).filter(Seat::isAvailable).count();
+	}
+	public StudyRoom(String URI, int capacity){
+		this(URI,new Table[0]);
+		this.capacity=capacity;
+		this.availableSeats=capacity;
 	}
 	public String getURI(){
 		return URI;
@@ -33,10 +43,10 @@ public class StudyRoom implements Serializable {
 		return Arrays.copyOf(features,features.length);
 	}
 	public int getCapacity(){
-		return /*capacity*/(int)Arrays.stream(tables).flatMap(t->Arrays.stream(t.getSeats())).count();
+		return tables.length==0?capacity:(int)Arrays.stream(tables).flatMap(t->Arrays.stream(t.getSeats())).count();
 	}
 	public int getAvailableSeats(){
-		return /*availableSeats*/(int)Arrays.stream(tables).flatMap(t->Arrays.stream(t.getSeats())).filter(Seat::isAvailable).count();
+		return tables.length==0?availableSeats:(int)Arrays.stream(tables).flatMap(t->Arrays.stream(t.getSeats())).filter(Seat::isAvailable).count();
 	}
 	public boolean isOpen(){
 		return open;
@@ -50,16 +60,16 @@ public class StudyRoom implements Serializable {
 	public String getUniversity(){
 		return university;
 	}
-	public Date getOpenTime(){
+	public LocalDateTime getOpenTime(){
 		return openTime;
 	}
-	public void setOpenTime(Date openTime){
+	public void setOpenTime(LocalDateTime openTime){
 		this.openTime=openTime;
 	}
-	public Date getCloseTime(){
+	public LocalDateTime getCloseTime(){
 		return closeTime;
 	}
-	public void setCloseTime(Date closeTime){
+	public void setCloseTime(LocalDateTime closeTime){
 		this.closeTime=closeTime;
 	}
 	public Table getTable(String URI){

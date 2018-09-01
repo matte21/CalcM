@@ -16,4 +16,7 @@ class KPPersistence extends Persistence {
 	void notifyChange(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other){
 		notifyObservers(seatURI,tableURI,studyRoomURI,change,other);
 	}
+	void initState(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other){
+		initObservers(seatURI,tableURI,studyRoomURI,change,other);
+	}
 }
