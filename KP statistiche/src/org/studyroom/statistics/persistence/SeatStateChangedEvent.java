@@ -3,12 +3,17 @@ package org.studyroom.statistics.persistence;
 public class SeatStateChangedEvent {
 	private final String seat,table,studyRoom;
 	private final SeatStateChange change,other;
+	private final boolean init;
 	public SeatStateChangedEvent(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other){
+		this(seatURI,tableURI,studyRoomURI,change,other,false);
+	}
+	public SeatStateChangedEvent(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other, boolean initEvent){
 		seat=seatURI;
 		table=tableURI;
 		studyRoom=studyRoomURI;
 		this.change=change;
 		this.other=other;
+		init=initEvent;
 	}
 	public String getSeatURI(){
 		return seat;
@@ -33,5 +38,8 @@ public class SeatStateChangedEvent {
 	}
 	public boolean hasSeatPartiallyAvailableChanged(){
 		return change.isChairChanged();
+	}
+	public boolean isInitEvent(){
+		return init;
 	}
 }

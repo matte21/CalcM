@@ -31,6 +31,10 @@ public abstract class Persistence extends Observable {
 		setChanged();
 		notifyObservers(new SeatStateChangedEvent(seatURI,tableURI,studyRoomURI,change,other));
 	}
+	protected void initObservers(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other){
+		setChanged();
+		notifyObservers(new SeatStateChangedEvent(seatURI,tableURI,studyRoomURI,change,other,true));
+	}
 	public abstract Collection<StudyRoom> getStudyRooms();
 	public Collection<String> getStudyRoomsNames(){
 		return getStudyRooms().stream().map(StudyRoom::getName).collect(Collectors.toList());
@@ -40,5 +44,8 @@ public abstract class Persistence extends Observable {
 	}
 	public String getStudyRoomName(String URI){
 		return getStudyRooms().stream().filter(r->r.getURI().equals(URI)).map(StudyRoom::getName).findFirst().orElseThrow(()->new IllegalArgumentException("URI "+URI+" not found"));
+	}
+	public StudyRoom getStudyRoom(String URI){
+		return getStudyRooms().stream().filter(r->r.getURI().equals(URI)).findFirst().orElseThrow(()->new IllegalArgumentException("URI "+URI+" not found"));
 	}
 }

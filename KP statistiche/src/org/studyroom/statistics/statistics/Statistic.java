@@ -1,13 +1,18 @@
 package org.studyroom.statistics.statistics;
 
 import java.io.*;
+import java.time.*;
+import java.time.temporal.*;
 import java.util.*;
+import java.util.stream.*;
+import org.studyroom.model.*;
 import org.studyroom.statistics.persistence.*;
 import org.studyroom.util.*;
 
-public abstract class Statistic implements Observer {
+public abstract class Statistic {
 	protected static final String SAVE_PATH="./statistics";
-	private static final Map<String,Statistic> statistics=new TreeMap<>();
+	private static final Map<String,Statistic> statistics=new LinkedHashMap<>();
+	private static final Timer timer=new Timer("StatisticTimer",true);
 	public static Statistic get(String name){
 		return statistics.get(name);
 	}
@@ -17,8 +22,12 @@ public abstract class Statistic implements Observer {
 	public static void loadStatistics(){
 		if (!statistics.isEmpty())
 			return;
+		RealTimeOccupation srt=new RealTimeOccupation();
 		Statistic[] st={
-				new S1()
+				srt,
+				new DailyStat(),
+				new WeeklyStat(),
+				new OccupationTimeStat()
 				//new ...()	TODO
 		};
 		File d=new File(SAVE_PATH);
@@ -33,17 +42,45 @@ public abstract class Statistic implements Observer {
 						System.err.println(f.getAbsolutePath()+" danneggiato");
 					}
 			}
-			Persistence.getInstance().addObserver(s);
+			if (s instanceof PeriodicStatistic)
+				srt.addIntValueListener((PeriodicStatistic)s);
+			else if (s instanceof RealTimeStatistic)
+				Persistence.getInstance().addObserver((RealTimeStatistic)s);
 			statistics.put(s.getName(),s);
 		}
+		schedule(Statistic::saveStatistics,Duration.ofDays(1));
+		Runtime.getRuntime().addShutdownHook(new Thread(Statistic::saveStatistics));
 	}
 	public static void saveStatistics(){
+		System.out.println("Saving statistic data");	//XXX
 		File d=new File(SAVE_PATH);
 		d.mkdirs();
 		for (Statistic s : statistics.values())
 			IniFile.write(new File(d,s.getClass().getSimpleName()+".ini"),s.saveStatisticData());
 	}
-	
+	protected static void schedule(Runnable task, Duration interval){
+		long d=interval.toMillis();
+		LocalDateTime t=LocalDateTime.now();
+		long i=Duration.between(t,t.plus(interval).truncatedTo(interval.toDays()>0?ChronoUnit.DAYS:interval.toHours()>0?ChronoUnit.HOURS:interval.toMinutes()>0?ChronoUnit.MINUTES:ChronoUnit.SECONDS)).toMillis();
+		timer.scheduleAtFixedRate(new TimerTask(){
+			@Override
+			public void run(){
+				task.run();
+			}
+		},i,d);
+		System.out.println("Task scheduled in "+i/1000+" s by "+Thread.currentThread().getStackTrace()[3].getClassName());	//XXX
+	}
+	protected static Value toValue(IntValue v){
+		return new Value(v.full,v.partial);
+	}
+	protected static Value getPercentValue(Value v, StudyRoom sr){
+		int n=sr.getCapacity();
+		return new Value(v.getFull()*100.0f/n,v.getPartial()*100.0f/n);
+	}
+	protected static Value getPercentValue(IntValue v, StudyRoom sr){
+		int n=sr.getCapacity();
+		return new Value(v.getFull()*100.0f/n,v.getPartial()*100.0f/n);
+	}
 
 	public abstract String getName();
 	public abstract String getValuesLabel();
@@ -52,9 +89,9 @@ public abstract class Statistic implements Observer {
 	protected abstract void loadStatisticData(Map<String,Map<String,String>> data);
 	protected abstract Map<String,Map<String,String>> saveStatisticData();
 	
-	private List<CategoryChangedListener> catListeners=new LinkedList<>();
-	private List<StatisticValueChangedListener> valListeners=new LinkedList<>();
-	private boolean additive, singleValue;
+	private final List<CategoryChangedListener> catListeners=new LinkedList<>();
+	private final List<StatisticValueChangedListener> valListeners=new LinkedList<>();
+	private final boolean additive, singleValue;
 	protected Statistic(boolean additive, boolean singleValue){
 		this.additive=additive;
 		this.singleValue=singleValue;
@@ -100,9 +137,37 @@ public abstract class Statistic implements Observer {
 	public String toString(){
 		return getName();
 	}
-	public static final class Value implements Comparable<Value> {
+	public static class Value implements Comparable<Value> {
+		private final float full,partial;
+		Value(float full, float partial){
+			this.full=full;
+			this.partial=partial;
+		}
+		/**@return the value considering only full-occupied seats */
+		public float getFull(){
+			return full;
+		}
+		/**@return the value considering only seats with free chair but occupied desk*/
+		public float getPartial(){
+			return partial;
+		}
+		/**@return the value considering all occupied seats */
+		public float getTotal(){
+			return full+partial;
+		}
+		@Override
+		public int compareTo(Value o){
+			float r=getTotal()-o.getTotal();
+			return (int)(r!=0?r:getFull()-o.getFull());
+		}
+		@Override
+		public String toString(){
+			return "("+full+","+partial+")";
+		}
+	}
+	protected static class IntValue implements Comparable<IntValue> {
 		private final int full,partial;
-		Value(int full, int partial){
+		IntValue(int full, int partial){
 			this.full=full;
 			this.partial=partial;
 		}
@@ -119,9 +184,13 @@ public abstract class Statistic implements Observer {
 			return full+partial;
 		}
 		@Override
-		public int compareTo(Value o){
+		public int compareTo(IntValue o){
 			int r=getTotal()-o.getTotal();
 			return r!=0?r:getFull()-o.getFull();
+		}
+		@Override
+		public String toString(){
+			return "("+full+","+partial+")";
 		}
 	}
 	public static interface CategoryChangedListener {
@@ -129,5 +198,8 @@ public abstract class Statistic implements Observer {
 	}
 	public static interface StatisticValueChangedListener {
 		void onValueChanged(Statistic source, String category, Value newValue);
+	}
+	protected static interface IntValueChangedListener {
+		void onValueChanged(String studyRoomURI, IntValue newValue);
 	}
 }
