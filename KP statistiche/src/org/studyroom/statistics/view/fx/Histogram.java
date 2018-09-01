@@ -1,5 +1,6 @@
 package org.studyroom.statistics.view.fx;
 
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.*;
 import javafx.beans.property.*;
@@ -52,22 +53,29 @@ public class Histogram extends StackedBarChart<String,Number> {
 			cat.clear();
 			cat.addAll(cp.get());
 		});
-		ObservableList<Series<String,Number>> data=toSeries(dp.get());
+		ObservableList<Series<String,Number>> data=toSeries(dp.get(),viewModel);
 		dp.addListener((l,o,n)->{
 			data.clear();
-			data.addAll(toSeries(dp.get()));
+			data.addAll(toSeries(dp.get(),viewModel));
 		});
 		return new Histogram(viewModel,valProp,catProp,tilesProp,dp,cp,tp,cat,data);
 	}
-	private static ObservableList<Series<String,Number>> toSeries(Map<String,List<Number>> data){
+	@SuppressWarnings("unchecked")
+	private static ObservableList<Series<String,Number>> toSeries(Map<String,List<Number>> data, Object viewModel){
 		Collection<Map.Entry<String,List<Number>>> c=data.entrySet();
 		if (c.isEmpty())
 			return FXCollections.emptyObservableList();
 		List<Number> l1=c.iterator().next().getValue();
 		List<Series<String,Number>> l=new ArrayList<>();
+		List<String> leg;
+		try{
+			leg=(List<String>)viewModel.getClass().getMethod("getLegend").invoke(viewModel);
+		} catch (IllegalAccessException|IllegalArgumentException|InvocationTargetException|NoSuchMethodException|SecurityException e){
+			leg=Collections.nCopies(l1.size(),"");
+		}
 		for (int i=0;i<l1.size();i++){
 			int ii=i;
-			l.add(new Series<>(FXCollections.observableArrayList(c.stream().map(e->new Data<>(e.getKey(),e.getValue().get(ii))).collect(Collectors.toList()))));
+			l.add(new Series<>(leg.get(i),FXCollections.observableArrayList(c.stream().map(e->new Data<>(e.getKey(),e.getValue().get(ii))).collect(Collectors.toList()))));
 		}
 		return FXCollections.observableList(l);
 	}
@@ -96,7 +104,7 @@ public class Histogram extends StackedBarChart<String,Number> {
 		//y.setTickUnit(1);	//doesn't work
 		y.setMinorTickVisible(false);
 		setAnimated(false);
-		setLegendVisible(false);
+		//setLegendVisible(false);
 	}
 	public String getBoundValuesPropertyName(){
 		return valProp;

@@ -10,6 +10,7 @@ import javafx.collections.*;
 
 public class BindingUtil {
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	public static <T> void bindObject(ObjectProperty<T> fxProp, String prop, Object viewModel){
 		try {
 			fxProp.bindBidirectional(JavaBeanObjectPropertyBuilder.create().bean(viewModel).name(prop).build());
@@ -17,6 +18,7 @@ public class BindingUtil {
 			throw new IllegalArgumentException(e);
 		}
 	}
+	@Deprecated
 	public static void bindString(StringProperty fxProp, String prop, Object viewModel){
 		try {
 			fxProp.bindBidirectional(JavaBeanStringPropertyBuilder.create().bean(viewModel).name(prop).build());
@@ -24,6 +26,7 @@ public class BindingUtil {
 			throw new IllegalArgumentException(e);
 		}
 	}
+	@Deprecated
 	public static void bindBoolean(BooleanProperty fxProp, String prop, Object viewModel){
 		try {
 			fxProp.bindBidirectional(JavaBeanBooleanPropertyBuilder.create().bean(viewModel).name(prop).build());
@@ -31,6 +34,7 @@ public class BindingUtil {
 			throw new IllegalArgumentException(e);
 		}
 	}
+	@Deprecated
 	public static void bindInteger(IntegerProperty fxProp, String prop, Object viewModel){
 		try {
 			fxProp.bindBidirectional(JavaBeanIntegerPropertyBuilder.create().bean(viewModel).name(prop).build());
@@ -38,6 +42,7 @@ public class BindingUtil {
 			throw new IllegalArgumentException(e);
 		}
 	}
+	@Deprecated
 	public static void bindLong(LongProperty fxProp, String prop, Object viewModel){
 		try {
 			fxProp.bindBidirectional(JavaBeanLongPropertyBuilder.create().bean(viewModel).name(prop).build());
@@ -45,6 +50,7 @@ public class BindingUtil {
 			throw new IllegalArgumentException(e);
 		}
 	}
+	@Deprecated
 	public static void bindFloat(FloatProperty fxProp, String prop, Object viewModel){
 		try {
 			fxProp.bindBidirectional(JavaBeanFloatPropertyBuilder.create().bean(viewModel).name(prop).build());
@@ -52,6 +58,7 @@ public class BindingUtil {
 			throw new IllegalArgumentException(e);
 		}
 	}
+	@Deprecated
 	public static void bindDouble(DoubleProperty fxProp, String prop, Object viewModel){
 		try {
 			fxProp.bindBidirectional(JavaBeanDoublePropertyBuilder.create().bean(viewModel).name(prop).build());
@@ -60,6 +67,7 @@ public class BindingUtil {
 		}
 	}
 	/**not implemented*/
+	@Deprecated
 	public static <T> void bindList(ListProperty<T> fxProp, String prop, Object viewModel){
 		try {
 			fxProp.bindBidirectional(new ReadOnlyJavaBeanListProperty<T>(viewModel,prop));
@@ -68,6 +76,7 @@ public class BindingUtil {
 		}
 	}
 	/**not implemented*/
+	@Deprecated
 	public static <T> void bindList(ObjectProperty<ObservableList<T>> fxProp, String prop, Object viewModel){
 		try {
 			fxProp.bindBidirectional(new ReadOnlyJavaBeanListProperty<T>(viewModel,prop));

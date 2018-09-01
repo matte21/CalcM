@@ -1,26 +1,73 @@
-﻿body,html{
+body,html{
 	text-align:center;
 	background-color:beige;
+	position:relative;
 }
 #menu{
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-	overflow: hidden;	/*senza questo scompare*/
-	background-color: #333333;
+	overflow:hidden;	/*senza questo scompare*/
+	
+}
+#menu, .midmenu>ul, .submenu>ul{
+	list-style-type:none;
+	margin:0;
+	padding:0;
+	background-color:#333333;
+	box-shadow:0px 10px 20px 0px rgba(0,0,0,0.3);
 }
 #menu li{
 	float:left;
 }
-#menu a{
-	display: block;
-	color: white;
-	text-align: center;
-	padding: 12px 25px;
-	text-decoration: none;
+#menu a, #menu div{
+	display:block;
+	color:white;
+	text-align:center;
+	padding:12px 25px;
+	text-decoration:none;
 }
-#menu a:hover{
+#menu a{
+	cursor:pointer;
+}
+#menu div{
+	cursor:default;
+}
+#menu a:hover, #menu div:hover{
 	background-color:black;
+}
+#menu .midmenu>ul{
+	display:none;
+	position:absolute;
+	left:0px;
+	width:100%;
+	z-index:1;
+}
+#menu .submenu>ul{
+	display:none;
+	position:absolute;
+	z-index:1;
+}
+#menu .submenu li{
+	float:none;
+}
+#menu .submenu a{
+	text-align:left;
+}
+#menu .midmenu:hover>ul, #menu .submenu:hover>ul{
+	display:block;
+}
+#legenda{
+	background-color:white;
+	font-size:10pt;
+	margin:10px auto;
+	padding:5px;
+}
+#legenda div{
+	border:solid 1px black;
+	display:inline;
+	vertical-align:middle;
+	width:10px;
+	height:10px;
+	max-height:10px;
+	min-width:10px;
 }
 svg{
 	overflow:hidden;
@@ -49,11 +96,13 @@ rect.step{
 	stroke:none;
 	fill:#cccccc;
 }
-rect.graph1{
+.graph1{
 	stroke:none;
 	fill:#3366cc;
+	background-color:#3366cc;
 }
-rect.graph2{
+.graph2{
 	stroke:none;
 	fill:#ff9933;
+	background-color:#ff9933;
 }

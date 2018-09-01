@@ -22,16 +22,20 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	}
 	@Override
 	protected void onSeatStateChanged(SeatStateChangedEvent e){
-		if (e.isInitEvent())
-			return;
 		byte s=e.isSeatAvailable()?Seat.FREE:e.isSeatPartiallyAvailable()?Seat.PARTIAL:Seat.FULL;
+		if (e.isInitEvent()){
+			seat.put(e.getSeatURI(),new SeatOccupation.Invalid(s));
+			return;
+		}
 		if (seat.containsKey(e.getSeatURI())){
 			SeatOccupation so=seat.get(e.getSeatURI());
 			so.setState(s);
 			if (so.isSetFree()){
 				seat.remove(e.getSeatURI());
-				val.get(e.getStudyRoomURI()).add(so);
-				notifyValueChange(Persistence.getInstance().getStudyRoomName(e.getStudyRoomURI()),getValue(e.getStudyRoomURI()));
+				if (so.toValue()!=null){
+					val.get(e.getStudyRoomURI()).add(so);
+					notifyValueChange(Persistence.getInstance().getStudyRoomName(e.getStudyRoomURI()),getValue(e.getStudyRoomURI()));
+				}
 			}
 		} else if (s!=Seat.FREE)
 			seat.put(e.getSeatURI(),new SeatOccupation(s));
@@ -45,7 +49,7 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	}
 	private Value getValue(String srURI){
 		List<SeatOccupation> l=val.get(srURI);
-		return l.parallelStream().map(SeatOccupation::toValue).reduce((v1,v2)->new IntValue(v1.getFull()+v2.getFull(),v1.getPartial()+v2.getPartial())).map(v->new Value((float)v.getFull()/l.size(),(float)v.getPartial()/l.size())).orElse(new Value(0,0));
+		return l.parallelStream().map(SeatOccupation::toValue).reduce((v1,v2)->new IntValue(v1.getFull()+v2.getFull(),v1.getPartial()+v2.getPartial())).map(v->new Value(v.getFull()/60.0f/l.size(),v.getPartial()/60.0f/l.size())).orElse(new Value(0,0));
 	}
 	@Override
 	protected void loadStatisticData(Map<String,Map<String,String>> data){
@@ -68,8 +72,8 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	}
 	protected static class SeatOccupation {
 		private SortedMap<Long,Byte> states=new TreeMap<>();
-		private boolean closed;
-		public SeatOccupation(Byte state){
+		protected boolean closed;
+		public SeatOccupation(byte state){
 			if (state!=Seat.PARTIAL && state!=Seat.FULL)
 				throw new IllegalArgumentException("Illegal state");
 			setState(state);
@@ -123,6 +127,26 @@ public class OccupationTimeStat extends RealTimeStatistic {
 			}
 			f=(int)(t/1000);
 			return new IntValue(f,p-f);
+		}
+		public static class Invalid extends SeatOccupation {
+			byte s;
+			public Invalid(byte state){
+				super(state);
+			}
+			@Override
+			public byte getState(){
+				return s;
+			}
+			@Override
+			void setState(byte state){
+				s=state;
+				if (state==Seat.FREE)
+					closed=true;
+			}
+			@Override
+			public IntValue toValue(){
+				return null;
+			}
 		}
 	}
 }

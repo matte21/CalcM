@@ -25,10 +25,41 @@ public class GraphicPage extends HTMLPage {
 				"		<script type=\"text/javascript\" src=\"rsc/script.js\"></script>\n"+
 				"	</head>\n"+
 				"	<body>\n"+
-				"		<ul id=\"menu\">\n");
+				"		<ul id=\"menu\">\n"+
+				"			<li class=\"submenu\">\n"+
+				"				<div>Statistiche</div>\n"+
+				"				<ul>\n");
 		for (String st : vm.getStatistics())
-			html.append("			<li><a href=\"javascript:selectStatistic('"+st+"')\">"+st+"</a></li>\n");
+			html.append("					<li><a href=\"javascript:selectStatistic('"+st+"')\">"+st+"</a></li>\n");
 		html.append(
+				"				</ul>\n"+
+				"			</li>\n"+
+				"			<li class=\"midmenu\">\n"+
+				"				<div>Aule studio</div>\n"+
+				"				<ul>\n");
+		for (String u : vm.getUniversities()){
+			html.append(
+					"					<li class=\"submenu\">"+
+					"						<div>"+u+"</div>\n"+
+					"						<ul>\n"+
+					"							<li><a href=\"javascript:selectStudyRoom('"+IMainViewModel.DEFAULT_SR+";university="+u+"')\">"+IMainViewModel.DEFAULT_SR+"</a></li>\n");
+			for (String sr : vm.getStudyRooms(u))
+				html.append("							<li><a href=\"javascript:selectStudyRoom('"+sr+";university="+u+"')\">"+sr+"</a></li>\n");
+			html.append(
+					"						</ul>\n"+
+					"					</li>\n");
+		}
+		html.append(
+				"				</ul>\n"+
+				"			</li>\n"+
+				"			<li class=\"submenu\">\n"+
+				"				<div>Visualizzazione</div>\n"+
+				"				<ul>\n");
+		for (String v : vm.getVisualizations())
+			html.append("					<li><a href=\"javascript:selectVisualization('"+v+"')\">"+v+"</a></li>\n");
+		html.append(
+				"				</ul>\n"+
+				"			</li>\n"+
 				"		</ul>\n"+
 				"		<div id=\"cont\">\n");
 		html.append(getGraphic(vm));
@@ -91,7 +122,15 @@ public class GraphicPage extends HTMLPage {
 		}
 		html.append(
 				"			<text class=\"cat\" x=\"50\" y=\""+H/2+"\" transform=\"rotate(-90 50,"+H/2+")\">"+vm.getTilesLabel()+"</text>\n"+
-				"		</svg>\n");
+				"		</svg>\n"+
+				"		<table id=\"legenda\">\n");
+		for (i=0;i<vm.getLegend().size();i++)
+			html.append(
+					"			<tr>\n"+
+					"				<td><div class=\"graph"+(i+1)+"\">&nbsp; &nbsp; &nbsp; </div></td>\n"+
+					"				<td>"+vm.getLegend().get(i)+"</td>\n"+
+					"			</tr>\n");
+		html.append("		</table>");
 		return html.toString();
 	}
 	public static class Socket extends WebSocket{
@@ -130,6 +169,14 @@ public class GraphicPage extends HTMLPage {
 			case "statistic":
 				try {
 					vm.selectStatistic(m[1]);
+				} catch (IllegalArgumentException e){
+					System.err.println(m[0]+": "+e.getMessage());
+					return;
+				}
+				break;
+			case "visualization":
+				try {
+					vm.selectVisualization(m[1]);
 				} catch (IllegalArgumentException e){
 					System.err.println(m[0]+": "+e.getMessage());
 					return;
