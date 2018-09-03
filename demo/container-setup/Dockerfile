@@ -13,16 +13,15 @@ WORKDIR /calcm-demo
 
 # The demo runs different processes interacting with an instance of a redsib v0.9, hence we copy the .tar.gz associated with the aforementioned version of the 
 # redsib
-COPY filesNeededInDockerContainer/redsib_0.9.2_amd64.tar.gz .
+COPY resources/redsib_0.9.2_amd64.tar.gz .
 
 # Extract the redsib v0.9 tar and remove it after the extraction has been completed
 RUN tar -xzf redsib_0.9.2_amd64.tar.gz; rm redsib_0.9.2_amd64.tar.gz
 
 # The sib start-up process is not trivial, thus it's embedded in the standalone script launch-sib.sh. Upon copying it to the container file system we need it
 # to be executable as it will be executed
-COPY filesNeededInDockerContainer/launch-sib.sh .
+COPY resources/launch-sib.sh .
 RUN chmod u+x ./launch-sib.sh
-
 
 WORKDIR /calcm-demo/redsib_0.9.2_amd64
 
