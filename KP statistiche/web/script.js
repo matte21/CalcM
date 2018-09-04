@@ -13,5 +13,8 @@ function selectStatistic(st){
 function selectStudyRoom(sr){
 	ws.send("studyRoom="+sr);
 }
+function selectVisualization(v){
+	ws.send("visualization="+v);
+}
 
 createWebSocket();

@@ -8,17 +8,19 @@ public interface IMainViewModel {
 	void addPropertyChangeListener(PropertyChangeListener l);
 	void removePropertyChangeListener(PropertyChangeListener l);
 	
-	//graphic
+	//graphic (only these are properties)
 	String getGraphicTitle();
 	String getTilesLabel();
 	List<String> getCategories();
 	Map<String,List<Double>> getData();
+	List<String> getLegend();
 	
 	//menus
 	static final String DEFAULT_SR="Tutte";
 	Collection<String> getStudyRooms(String university);
 	Collection<String> getUniversities();
 	Collection<String> getStatistics();
+	Collection<String> getVisualizations();
 	
 	//actions
 	void selectStatistic(String name);

@@ -15,11 +15,16 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	private final CategoryChangedListener catListener=(s,o,n)->{cacheValid=false; firePropertyChange("categories",null,getCategories());};
 	private final StatisticValueChangedListener valListener=(s,c,v)->{cacheValid=false; firePropertyChange("data",null,getData());};
 	private final Aggregator[] aggregators={Aggregator.COMPARISON,Aggregator.SUM,Aggregator.AVERAGE};
+	private final List<String> legend=Arrays.asList("posti totalmente occupati","posti parzialmente occupati");
+	private final Map<String,Visualization> visualizations=new LinkedHashMap<>();
 	private Aggregator aggregator;
 	private Map<String,List<Double>> cacheData;
 	private boolean init,cacheValid;
 	
 	public MainViewModel(){
+		visualizations.put("tutto",Visualization.BOTH);
+		visualizations.put("posti totalmente occupati",Visualization.FULL);
+		visualizations.put("posti parzialmente occupati",Visualization.PARTIAL);
 		setStatistic(Statistic.get(Statistic.getStatisticsNames().stream().findFirst().get()));
 		selectStudyRoom(DEFAULT_SR,getStudyRooms().stream().findFirst().get().getUniversity());
 		init=true;
@@ -72,10 +77,8 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	}
 	private List<Double> toGraphicData(Statistic.Value v){
 		List<Double> d=new ArrayList<>(2);
-		if (visualization.showFull())
-			d.add((double)v.getFull());
-		if (visualization.showPartial())
-			d.add((double)v.getPartial());
+		d.add((double)(visualization.showFull()?v.getFull():0));
+		d.add((double)(visualization.showPartial()?v.getPartial():0));
 		return d;
 	}
 	private Aggregator getAggregator(){
@@ -90,6 +93,10 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	}
 	public String getVisualization(){
 		return visualization.name().toLowerCase();
+	}
+	@Override
+	public List<String> getLegend(){
+		return legend;
 	}
 
 	public String getStatistic(){
@@ -107,7 +114,7 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 		//firePropertyChange("statistic",n,getStatistic());
 		aggregator=getAggregator();
 		cacheValid=false;
-		firePropertyChange("categories",null,getData());
+		firePropertyChange("categories",null,getCategories());
 		firePropertyChange("tilesLabel",l,getTilesLabel());
 		firePropertyChange("data",null,getData());
 		updateGraphicTitle();
@@ -128,10 +135,10 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	}
 	@Override
 	public void selectVisualization(String option){
-		//String v=getVisualization();
-		visualization=Visualization.valueOf(option.toUpperCase());	//can throw IllegalArgumentException
+		if (!visualizations.containsKey(option))
+			throw new IllegalArgumentException("Unknown visualization");
+		visualization=visualizations.get(option);
 		cacheValid=false;
-		//firePropertyChange("visualization",v,getVisualization());
 		firePropertyChange("data",null,getData());
 	}
 	
@@ -146,6 +153,10 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	@Override
 	public Collection<String> getUniversities(){
 		return getStudyRooms().stream().map(StudyRoom::getUniversity).distinct().collect(Collectors.toList());
+	}
+	@Override
+	public Collection<String> getVisualizations(){
+		return visualizations.keySet();
 	}
 	
 	@Override

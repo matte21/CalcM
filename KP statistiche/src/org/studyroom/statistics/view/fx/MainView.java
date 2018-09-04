@@ -36,6 +36,11 @@ public class MainView extends BorderPane {
 					m.setOnAction(e->this.viewModel.selectStudyRoom(s,u));
 					return m;
 				}).toArray(MenuItem[]::new))).toArray(Menu[]::new)),
+				new Menu("Visualizza",null,vm.getVisualizations().stream().map(s->{
+					MenuItem m=new MenuItem(s);
+					m.setOnAction(e->this.viewModel.selectVisualization(s));
+					return m;
+				}).toArray(MenuItem[]::new)),
 				new Menu("Opzioni",null,aot,not)
 		);
 		setTop(mb);
@@ -48,6 +53,5 @@ public class MainView extends BorderPane {
 		VBox p=new VBox(tit,h);
 		p.setAlignment(Pos.CENTER);
 		setCenter(p);
-		//tit.setBackground(new Background(new BackgroundFill(Color.RED,null,null)));
 	}
 }
