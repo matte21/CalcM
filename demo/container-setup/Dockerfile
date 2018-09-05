@@ -41,6 +41,14 @@ RUN echo $installVirtuoso | ./install.sh
 
 WORKDIR /calcm-demo
 
+# In the demo we need the SIB to store the study room ontology and the dataset for the demo (study room instances, etc...). We can load all these items into
+# the SIB with the ConfigurableJenaBasedOntologyLoader. Thus, we put it into the container the corrosponding archive, extract it, make its launch script 
+# executable and remove the archive as we no longer need it.
+COPY resources/ontologyLoader.tar.gz .
+RUN tar -xzf ontologyLoader.tar.gz && \
+    chmod u+x ./ontologyLoader/bin/ConfigurableJenaBasedOntologyLoader && \
+    rm ontologyLoader.tar.gz   
+
 # The sib start-up process is not trivial, thus it's embedded in the standalone script init-sib-and-aggregators.sh. Upon copying it to the container file 
 # system we need it to be executable as it will be executed
 COPY resources/init-sib-and-aggregators.sh .
@@ -50,15 +58,7 @@ RUN chmod u+x ./init-sib-and-aggregators.sh
 ENV sib_host=localhost
 ENV sib_port=10010
 ENV smartspace_name=demo-smartspace 
-ENV ontology_and_demo_dataset_url=file:///home/calcm-demo/ontologyLoader/ontology-and-demo-dataset.owl
-
-# In the demo we need the SIB to store the study room ontology and the dataset for the demo (study room instances, etc...). We can load all these items into
-# the SIB with the ConfigurableJenaBasedOntologyLoader. Thus, we put it into the container the corrosponding archive, extract it, make its launch script 
-# executable and remove the archive as we no longer need it.
-COPY resources/ontologyLoader.tar.gz .
-RUN tar -xzf ontologyLoader.tar.gz && \
-    chmod u+x ./ontologyLoader/bin/ConfigurableJenaBasedOntologyLoader && \
-    rm ontologyLoader.tar.gz   
+ENV ontology_and_demo_dataset_url=file:///calcm-demo/ontologyLoader/ontology-and-demo-dataset.owl
 
 # Expose port where the SIB will listen for tcp connections
 EXPOSE $sib_port

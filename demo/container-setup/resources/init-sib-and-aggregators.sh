@@ -11,11 +11,14 @@ redsibd --ram-hash "$smartspace_name" &
 # Wait for redsib daemon to be up and running before invoking sib-tcp
 sleep 3s
 
-# Listen for messages to the SIB on port 10010 (default port nbr if no args are provided)
-sib-tcp &
+# Listen for messages to the SIB on port $sib_port
+sib-tcp -p "$sib_port" &
 
 # Wait for the SIB TCP server to be up and running
 sleep 10s
 
 # Load the ontology and the test dataset into the SIB. These variables MUST have been already set (for instance in the Dockerfile).
-./ontologyLoader/bin/ConfigurableJenaBasedOntologyLoader "$sib_host" "$sib_port" "$smartspace_name" "$ontology_and_demo_dataset_url" &
+./ontologyLoader/bin/ConfigurableJenaBasedOntologyLoader "$sib_host" "$sib_port" "$smartspace_name" "$ontology_and_demo_dataset_url"
+
+# Command to keep the container running. Otherwise it stops after the ontology gets inserted. This is only a temporary, quick and dirty solution.
+tail -f /dev/null
