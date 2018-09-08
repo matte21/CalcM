@@ -65,7 +65,7 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 			return Collections.emptyMap();
 		if (!cacheValid){
 			cacheValid=true;
-			Map<String,Value> g=selectedSR.size()==1?statistic.getValues(selectedSR.get(0).getURI()):selectedSR.stream().map(StudyRoom::getURI).map(statistic::getValues).collect(aggregator);
+			Map<String,Value> g=selectedSR.size()==1?statistic.getValues(selectedSR.get(0).getID()):selectedSR.stream().map(StudyRoom::getID).map(statistic::getValues).collect(aggregator);
 			cacheData=new LinkedHashMap<>();
 			g.forEach((c,v)->cacheData.put(c,toGraphicData(v)));
 		}

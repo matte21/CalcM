@@ -83,7 +83,7 @@ public abstract class Statistic {
 
 	public abstract String getName();
 	public abstract String getValuesLabel();
-	public abstract Map<String,Value> getValues(String studyRoomURI);
+	public abstract Map<String,Value> getValues(String studyRoomID);
 	//public abstract Collection<String> getCategories();
 	protected abstract void loadStatisticData(Map<String,Map<String,String>> data);
 	protected abstract Map<String,Map<String,String>> saveStatisticData();
@@ -199,6 +199,6 @@ public abstract class Statistic {
 		void onValueChanged(Statistic source, String category, Value newValue);
 	}
 	protected static interface IntValueChangedListener {
-		void onValueChanged(String studyRoomURI, IntValue newValue);
+		void onValueChanged(String studyRoomID, IntValue newValue);
 	}
 }

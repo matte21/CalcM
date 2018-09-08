@@ -10,7 +10,7 @@ public class RealTimeOccupation extends RealTimeStatistic implements Observer {
 	private final List<IntValueChangedListener> valListeners=new LinkedList<>();
 	public RealTimeOccupation(){
 		super(false,true);
-		for (String uri : Persistence.getInstance().getStudyRoomsURIs())
+		for (String uri : Persistence.getInstance().getStudyRoomsIDs())
 			val.put(uri,new IntValue(0,0));
 	}
 	@Override
@@ -23,10 +23,10 @@ public class RealTimeOccupation extends RealTimeStatistic implements Observer {
 	}
 	@Override
 	public void onSeatStateChanged(SeatStateChangedEvent e){
-		IntValue v=val.get(e.getStudyRoomURI());
+		IntValue v=val.get(e.getStudyRoomID());
 		int f=v.getFull(), p=v.getPartial();
-		seat.putIfAbsent(e.getSeatURI(),new Seat());
-		Seat s=seat.get(e.getSeatURI());
+		seat.putIfAbsent(e.getSeatID(),new Seat());
+		Seat s=seat.get(e.getSeatID());
 		if (s.isFullyOccupied())
 			f--;
 		else if (s.isPartiallyOccupied())
@@ -37,16 +37,16 @@ public class RealTimeOccupation extends RealTimeStatistic implements Observer {
 		else if (s.isPartiallyOccupied())
 			p++;
 		v=new IntValue(f,p);
-		val.put(e.getStudyRoomURI(),v);
-		StudyRoom sr=Persistence.getInstance().getStudyRoom(e.getStudyRoomURI());
+		val.put(e.getStudyRoomID(),v);
+		StudyRoom sr=Persistence.getInstance().getStudyRoom(e.getStudyRoomID());
 		notifyChange(sr,v,e.isInitEvent());
 	}
 	@Override
-	public Map<String,Value> getValues(String srURI){
+	public Map<String,Value> getValues(String srID){
 		Map<String,Value> m=new LinkedHashMap<>();
-		if (val.containsKey(srURI)){
-			StudyRoom sr=Persistence.getInstance().getStudyRoom(srURI);
-			m.put(sr.getName(),getPercentValue(val.get(srURI),sr));
+		if (val.containsKey(srID)){
+			StudyRoom sr=Persistence.getInstance().getStudyRoom(srID);
+			m.put(sr.getName(),getPercentValue(val.get(srID),sr));
 		}
 		return m;
 	}
@@ -54,7 +54,7 @@ public class RealTimeOccupation extends RealTimeStatistic implements Observer {
 		notifyValueChange(sr.getName(),getPercentValue(v,sr));
 		if (!init)
 			for (IntValueChangedListener l : valListeners)
-				l.onValueChanged(sr.getURI(),v);
+				l.onValueChanged(sr.getID(),v);
 	}
 	@Override
 	protected void loadStatisticData(Map<String,Map<String,String>> data){}

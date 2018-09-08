@@ -6,13 +6,14 @@ import org.studyroom.model.*;
 import org.studyroom.statistics.persistence.*;
 import static org.studyroom.statistics.persistence.SeatStateChange.*;
 
-public class MockKP {
-	private static MockKP instance=new MockKP();
+public class MockKP extends KPStatistics {
+	private static MockKP instance;
 	public static MockKP getInstance(){
+		if (instance==null)
+			instance=new MockKP();
 		return instance;
 	}
 	private final StudyRoom[] sr;
-	private final KPPersistence persistence;
 	public MockKP(){
 		sr=new StudyRoom[]{
 			new StudyRoom("sr1",new Table[]{
@@ -49,11 +50,15 @@ public class MockKP {
 							new Seat("sr2t1s8")
 					})
 				},"Aula studio biblioteca","Alma Mater Studiorum")};
-		persistence=new KPPersistence(new StudyRoom[]{
+	}
+	@Override
+	protected KPPersistence createPersistence(){
+		return new KPPersistence(new StudyRoom[]{
 				new StudyRoom("sr1",sr[0].getCapacity(),"Aula studio lab4","Alma Mater Studiorum"),
 				new StudyRoom("sr2",sr[1].getCapacity(),"Aula studio biblioteca","Alma Mater Studiorum")
 		});
 	}
+	@Override
 	public void start(){
 		initSeat(0,0,1,CHAIR_OCCUPIED);
 		initSeat(0,0,1,DESK_OCCUPIED);
@@ -94,7 +99,7 @@ public class MockKP {
 					s.setDeskAvailable(c.isFree());
 					o=s.isChairAvailable()?CHAIR_FREE:CHAIR_OCCUPIED;
 				}
-				persistence.notifyChange(s.getURI(),t.getURI(),r.getURI(),c,o);
+				getPersistence().notifyChange(s.getID(),t.getID(),r.getID(),c,o);
 				System.out.println("Posti occupati: "+(sr[0].getCapacity()-sr[0].getAvailableSeats())+", "+(sr[1].getCapacity()-sr[1].getAvailableSeats()));
 			}
 		},1000,1000);
@@ -108,21 +113,21 @@ public class MockKP {
 		switch (state){
 		case CHAIR_FREE:
 			s.setChairAvailable(true);
-			other=s.isDeskAvailable()?DESK_FREE:DESK_OCCUPIED;
+			other=desk(!s.isDeskAvailable());
 			break;
 		case CHAIR_OCCUPIED:
 			s.setChairAvailable(false);
-			other=s.isDeskAvailable()?DESK_FREE:DESK_OCCUPIED;
+			other=desk(!s.isDeskAvailable());
 			break;
 		case DESK_FREE:
 			s.setDeskAvailable(true);
-			other=s.isChairAvailable()?CHAIR_FREE:CHAIR_OCCUPIED;
+			other=chair(!s.isChairAvailable());
 			break;
 		case DESK_OCCUPIED:
 			s.setDeskAvailable(false);
-			other=s.isChairAvailable()?CHAIR_FREE:CHAIR_OCCUPIED;
+			other=chair(!s.isChairAvailable());
 			break;
 		}
-		persistence.initState(s.getURI(),t.getURI(),sr.getURI(),state,other);
+		getPersistence().initState(s.getID(),t.getID(),sr.getID(),state,other);
 	}
 }

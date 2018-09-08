@@ -9,8 +9,8 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	private final Map<String,List<SeatOccupation>> val=new TreeMap<>();
 	public OccupationTimeStat(){
 		super(false,true);
-		for (String uri : Persistence.getInstance().getStudyRoomsURIs())
-			val.put(uri,new LinkedList<>());
+		for (String id : Persistence.getInstance().getStudyRoomsIDs())
+			val.put(id,new LinkedList<>());
 	}
 	@Override
 	public String getName(){
@@ -24,31 +24,31 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	protected void onSeatStateChanged(SeatStateChangedEvent e){
 		byte s=e.isSeatAvailable()?Seat.FREE:e.isSeatPartiallyAvailable()?Seat.PARTIAL:Seat.FULL;
 		if (e.isInitEvent()){
-			seat.put(e.getSeatURI(),new SeatOccupation.Invalid(s));
+			seat.put(e.getSeatID(),new SeatOccupation.Invalid(s));
 			return;
 		}
-		if (seat.containsKey(e.getSeatURI())){
-			SeatOccupation so=seat.get(e.getSeatURI());
+		if (seat.containsKey(e.getSeatID())){
+			SeatOccupation so=seat.get(e.getSeatID());
 			so.setState(s);
 			if (so.isSetFree()){
-				seat.remove(e.getSeatURI());
+				seat.remove(e.getSeatID());
 				if (so.toValue()!=null){
-					val.get(e.getStudyRoomURI()).add(so);
-					notifyValueChange(Persistence.getInstance().getStudyRoomName(e.getStudyRoomURI()),getValue(e.getStudyRoomURI()));
+					val.get(e.getStudyRoomID()).add(so);
+					notifyValueChange(Persistence.getInstance().getStudyRoomName(e.getStudyRoomID()),getValue(e.getStudyRoomID()));
 				}
 			}
 		} else if (s!=Seat.FREE)
-			seat.put(e.getSeatURI(),new SeatOccupation(s));
+			seat.put(e.getSeatID(),new SeatOccupation(s));
 	}
 	@Override
-	public Map<String,Value> getValues(String srURI){
+	public Map<String,Value> getValues(String srID){
 		Map<String,Value> m=new LinkedHashMap<>();
-		if (val.containsKey(srURI))
-			m.put(Persistence.getInstance().getStudyRoomName(srURI),getValue(srURI));
+		if (val.containsKey(srID))
+			m.put(Persistence.getInstance().getStudyRoomName(srID),getValue(srID));
 		return m;
 	}
-	private Value getValue(String srURI){
-		List<SeatOccupation> l=val.get(srURI);
+	private Value getValue(String srID){
+		List<SeatOccupation> l=val.get(srID);
 		return l.parallelStream().map(SeatOccupation::toValue).reduce((v1,v2)->new IntValue(v1.getFull()+v2.getFull(),v1.getPartial()+v2.getPartial())).map(v->new Value(v.getFull()/60.0f/l.size(),v.getPartial()/60.0f/l.size())).orElse(new Value(0,0));
 	}
 	@Override

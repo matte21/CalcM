@@ -2,6 +2,7 @@ package org.studyroom;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.*;
 import org.jdom2.*;
 import org.jdom2.input.*;
 import sofia_kp.*;
@@ -15,11 +16,26 @@ public class SIBUtils {
 	}
 	
 	/**Load namespaces to use when make triples 
-	 * @param xml - a RDF/XML document from which load namespaces
-	 */
-	public static void initNamespaces(String xml) {
+	 * @param xml - a RDF/XML document from which load namespaces */
+	public static void initNamespaces(File xml){
 		try {
-			Element r=new SAXBuilder().build(new ByteArrayInputStream(xml.getBytes())).getRootElement();
+			initNamespaces(new FileInputStream(xml));
+		} catch (FileNotFoundException e){
+			throw new IllegalArgumentException(e);
+		}
+	}
+	
+	/**Load namespaces to use when make triples 
+	 * @param xml - a RDF/XML document from which load namespaces */
+	public static void initNamespaces(String xml){
+		initNamespaces(new ByteArrayInputStream(xml.getBytes()));
+	}
+
+	/**Load namespaces to use when make triples 
+	 * @param in - a RDF/XML document from which load namespaces */
+	public static void initNamespaces(InputStream in){
+		try {
+			Element r=new SAXBuilder().build(in).getRootElement();
 			for (Namespace n : r.getNamespacesInScope())
 				ns.putIfAbsent(n.getPrefix(),n.getURI());
 		} catch (Exception e){
@@ -31,8 +47,7 @@ public class SIBUtils {
 	 * Don't use default namespaces for URI elements.
 	 * @param triples - Array of elements; every group of 5 elements is formed by
 	 *  				subject, predicate, object, subject type and object type
-	 * @return a Vector of triples, each of them stored as a Vector
-	 */
+	 * @return a Vector of triples, each of them stored as a Vector */
 	public static Vector<Vector<String>> tripleList(String...triples){
 		if (triples.length%5!=0)
 			throw new IllegalArgumentException("missing arguments to make a triple");
@@ -58,8 +73,7 @@ public class SIBUtils {
 	
 	/**Transform a RDF/XML document in the format required by RDF query.
 	 * @param xml - a RDF/XML document
-	 * @return a Vector of triples, each of them stored as a Vector
-	 */
+	 * @return a Vector of triples, each of them stored as a Vector */
 	public static Vector<Vector<String>> tripleListFromXML(String xml){
 		try {
 			Element r=new SAXBuilder().build(new ByteArrayInputStream(xml.getBytes())).getRootElement();
@@ -96,10 +110,18 @@ public class SIBUtils {
 		}
 	}
 	
+	/**Shortcut method to get the result list from a SPARQL query.
+	 * To access each value of a result, use {@code SSAP_sparql_response.getCellValue()} method.
+	 * @param sib - the SIB to which send the query
+	 * @param query - the SPARQL query
+	 * @return the results list */
+	public static Vector<Vector<String[]>> query(KPICore sib, String query){
+		return new SSAP_sparql_response(sib.querySPARQL(query).Message).getResults();
+	}
+	
 	/**Prints the SIB response to the standard output in case of success
 	 * or to the standard error otherwise
-	 * @param r - the SIB response to print
-	 */
+	 * @param r - the SIB response to print */
 	public static void printSIBResponse(SIBResponse r){
 		if (!r.isConfirmed()){
 			System.err.println(r.TransactionType+" fallito:");
@@ -109,8 +131,7 @@ public class SIBUtils {
 	}
 	
 	/**Print an XML-like object to the standard output (without indentation).
-	 * @param xml - an XML-like object
-	 */
+	 * @param xml - an XML-like object */
 	public static void printXml(Object xml){
 		System.out.println(xml.toString().replaceAll("><",">\r\n<"));
 		System.out.println();
@@ -118,11 +139,21 @@ public class SIBUtils {
 	
 	/**Print an XML-like object to the specified PrintStream (without indentation).
 	 * @param xml - an XML-like object
-	 * @param out - the PrintStream in which print
-	 */
+	 * @param out - the PrintStream in which print */
 	public static void printXml(Object xml, PrintStream out){
 		out.println(xml.toString().replaceAll("><",">\r\n<"));
 		out.println();
 	}
-
+	
+	/**Prepare the PREFIX clauses of a SPARQL query
+	 * @param namespacePref - list of prefixes used in the query
+	 * @return The PREFIX clauses of the query */
+	public static String sparqlPrefix(String...namespacePref){
+		return Arrays.stream(namespacePref).map(p->"PREFIX "+p+":<"+getNS(p)+">").collect(Collectors.joining("\n","","\n"));
+	}
+	
+	/**undo char transforms maked by the KP before sending message*/
+	public static String decodeXMLChars(String s){
+		return s.replaceAll("&lt;","<").replaceAll("&gt;",">").replaceAll("&apos;","'").replaceAll("&quot;","\"").replaceAll("&amp;","&");
+	}
 }

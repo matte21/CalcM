@@ -6,17 +6,17 @@ import org.studyroom.statistics.persistence.*;
 
 class KPPersistence extends Persistence {
 	private final StudyRoom[] studyRooms;
-	public KPPersistence(StudyRoom[] studyRooms){
+	KPPersistence(StudyRoom[] studyRooms){
 		this.studyRooms=studyRooms;
 	}
 	@Override
 	public Collection<StudyRoom> getStudyRooms(){
 		return Arrays.asList(studyRooms);
 	}
-	void notifyChange(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other){
-		notifyObservers(seatURI,tableURI,studyRoomURI,change,other);
+	void notifyChange(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
+		notifyObservers(seatID,tableID,studyRoomID,change,other);
 	}
-	void initState(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other){
-		initObservers(seatURI,tableURI,studyRoomURI,change,other);
+	void initState(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
+		initObservers(seatID,tableID,studyRoomID,change,other);
 	}
 }

@@ -27,25 +27,25 @@ public abstract class Persistence extends Observable {
 	protected Persistence(){
 		setInstance(this);
 	}
-	protected void notifyObservers(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other){
+	protected void notifyObservers(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
 		setChanged();
-		notifyObservers(new SeatStateChangedEvent(seatURI,tableURI,studyRoomURI,change,other));
+		notifyObservers(new SeatStateChangedEvent(seatID,tableID,studyRoomID,change,other));
 	}
-	protected void initObservers(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other){
+	protected void initObservers(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
 		setChanged();
-		notifyObservers(new SeatStateChangedEvent(seatURI,tableURI,studyRoomURI,change,other,true));
+		notifyObservers(new SeatStateChangedEvent(seatID,tableID,studyRoomID,change,other,true));
 	}
 	public abstract Collection<StudyRoom> getStudyRooms();
 	public Collection<String> getStudyRoomsNames(){
 		return getStudyRooms().stream().map(StudyRoom::getName).collect(Collectors.toList());
 	}
-	public Collection<String> getStudyRoomsURIs(){
-		return getStudyRooms().stream().map(StudyRoom::getURI).collect(Collectors.toList());
+	public Collection<String> getStudyRoomsIDs(){
+		return getStudyRooms().stream().map(StudyRoom::getID).collect(Collectors.toList());
 	}
-	public String getStudyRoomName(String URI){
-		return getStudyRooms().stream().filter(r->r.getURI().equals(URI)).map(StudyRoom::getName).findFirst().orElseThrow(()->new IllegalArgumentException("URI "+URI+" not found"));
+	public String getStudyRoomName(String ID){
+		return getStudyRooms().stream().filter(r->r.getID().equals(ID)).map(StudyRoom::getName).findFirst().orElseThrow(()->new IllegalArgumentException("ID "+ID+" not found"));
 	}
-	public StudyRoom getStudyRoom(String URI){
-		return getStudyRooms().stream().filter(r->r.getURI().equals(URI)).findFirst().orElseThrow(()->new IllegalArgumentException("URI "+URI+" not found"));
+	public StudyRoom getStudyRoom(String ID){
+		return getStudyRooms().stream().filter(r->r.getID().equals(ID)).findFirst().orElseThrow(()->new IllegalArgumentException("ID "+ID+" not found"));
 	}
 }

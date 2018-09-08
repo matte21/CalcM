@@ -6,26 +6,26 @@ import java.util.*;
 
 public class StudyRoom implements Serializable {
 	private static final long serialVersionUID=1;
-	private String URI,name,university;
+	private String ID,name,university;
 	private Table[] tables;
 	private String[] features;
 	private int capacity,availableSeats;
 	private boolean open;
 	private LocalDateTime openTime,closeTime;
-	public StudyRoom(String URI, Table[] tables, String name, String university, String...features){
-		this(URI,tables);
+	public StudyRoom(String ID, Table[] tables, String name, String university, String...features){
+		this(ID,tables);
 		this.name=name;
 		this.university=university;
 		this.features=features;
 	}
-	public StudyRoom(String URI, int capacity, String name, String university, String...features){
-		this(URI,capacity);
+	public StudyRoom(String ID, int capacity, String name, String university, String...features){
+		this(ID,capacity);
 		this.name=name;
 		this.university=university;
 		this.features=features;
 	}
-	public StudyRoom(String URI, Table[] tables){
-		this.URI=URI;
+	public StudyRoom(String ID, Table[] tables){
+		this.ID=ID;
 		this.tables=tables;
 	}
 	public StudyRoom(String URI, int capacity){
@@ -33,8 +33,8 @@ public class StudyRoom implements Serializable {
 		this.capacity=capacity;
 		this.availableSeats=capacity;
 	}
-	public String getURI(){
-		return URI;
+	public String getID(){
+		return ID;
 	}
 	public String getName(){
 		return name;
@@ -72,33 +72,33 @@ public class StudyRoom implements Serializable {
 	public void setCloseTime(LocalDateTime closeTime){
 		this.closeTime=closeTime;
 	}
-	public Table getTable(String URI){
+	public Table getTable(String ID){
 		for (Table t : tables)
-			if (t.getURI().equals(URI))
+			if (t.getID().equals(ID))
 				return t;
 		return null;
 	}
-	public Seat getSeat(String URI){
+	public Seat getSeat(String ID){
 		for (Table t : tables){
-			Seat s=t.getSeat(URI);
+			Seat s=t.getSeat(ID);
 			if (s!=null)
 				return s;
 		}
 		return null;
 	}
-	/*public Seat getSeat2(String URI){	//si è dimostrata meno efficiente se 
-		return Arrays.stream(tables).flatMap(t->Arrays.stream(t.getSeats())).filter(s->s.getURI().equals(URI)).findFirst().orElse(null);
+	/*public Seat getSeat2(String ID){	//si è dimostrata meno efficiente se 
+		return Arrays.stream(tables).flatMap(t->Arrays.stream(t.getSeats())).filter(s->s.getID().equals(ID)).findFirst().orElse(null);
 	}*/
 	@Override
 	public String toString(){
-		return URI;
+		return ID;
 	}
 	@Override
 	public boolean equals(Object o){
-		return o instanceof StudyRoom && ((StudyRoom)o).getURI().equals(URI);
+		return o instanceof StudyRoom && ((StudyRoom)o).getID().equals(ID);
 	}
 	@Override
 	public int hashCode(){
-		return URI.hashCode();
+		return ID.hashCode();
 	}
 }

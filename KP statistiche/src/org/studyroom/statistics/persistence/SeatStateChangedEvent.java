@@ -4,24 +4,24 @@ public class SeatStateChangedEvent {
 	private final String seat,table,studyRoom;
 	private final SeatStateChange change,other;
 	private final boolean init;
-	public SeatStateChangedEvent(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other){
-		this(seatURI,tableURI,studyRoomURI,change,other,false);
+	public SeatStateChangedEvent(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
+		this(seatID,tableID,studyRoomID,change,other,false);
 	}
-	public SeatStateChangedEvent(String seatURI, String tableURI, String studyRoomURI, SeatStateChange change, SeatStateChange other, boolean initEvent){
-		seat=seatURI;
-		table=tableURI;
-		studyRoom=studyRoomURI;
+	public SeatStateChangedEvent(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other, boolean initEvent){
+		seat=seatID;
+		table=tableID;
+		studyRoom=studyRoomID;
 		this.change=change;
 		this.other=other;
 		init=initEvent;
 	}
-	public String getSeatURI(){
+	public String getSeatID(){
 		return seat;
 	}
-	public String getTableURI(){
+	public String getTableID(){
 		return table;
 	}
-	public String getStudyRoomURI(){
+	public String getStudyRoomID(){
 		return studyRoom;
 	}
 	public SeatStateChange getChange(){

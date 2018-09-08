@@ -11,9 +11,9 @@ public class WeeklyStat extends PeriodicStatistic {
 	private final Map<String,Map<Integer,List<IntValue>>> val=new HashMap<>();
 	public WeeklyStat(){
 		super(false,false,Duration.ofDays(1));
-		for (String uri : Persistence.getInstance().getStudyRoomsURIs()){
-			currentVal.put(uri,new IntValue(0,0));
-			val.put(uri,new TreeMap<>());
+		for (String id : Persistence.getInstance().getStudyRoomsIDs()){
+			currentVal.put(id,new IntValue(0,0));
+			val.put(id,new TreeMap<>());
 		}
 	}
 	@Override
@@ -25,10 +25,10 @@ public class WeeklyStat extends PeriodicStatistic {
 		return "% posti occupati";
 	}
 	@Override
-	public void onValueChanged(String studyRoomURI, IntValue v){
+	public void onValueChanged(String studyRoomID, IntValue v){
 		synchronized (currentVal){
-			if (v.compareTo(currentVal.get(studyRoomURI))>0)
-				currentVal.put(studyRoomURI,v);
+			if (v.compareTo(currentVal.get(studyRoomID))>0)
+				currentVal.put(studyRoomID,v);
 		}
 	}
 	@Override
@@ -79,11 +79,11 @@ public class WeeklyStat extends PeriodicStatistic {
 		}
 	}
 	@Override
-	public Map<String,Value> getValues(String srURI){
+	public Map<String,Value> getValues(String srID){
 		Map<String,Value> m=new LinkedHashMap<>();
-		if (val.containsKey(srURI)){
-			StudyRoom sr=Persistence.getInstance().getStudyRoom(srURI);
-			Map<Integer,List<IntValue>> ml=val.get(srURI);
+		if (val.containsKey(srID)){
+			StudyRoom sr=Persistence.getInstance().getStudyRoom(srID);
+			Map<Integer,List<IntValue>> ml=val.get(srID);
 			synchronized (ml){
 				for (Map.Entry<Integer,List<IntValue>> e : ml.entrySet())
 					m.put(DAYS[e.getKey()],getPercentValue(e.getValue(),sr));

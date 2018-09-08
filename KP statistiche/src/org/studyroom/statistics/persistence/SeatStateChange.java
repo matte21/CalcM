@@ -19,4 +19,10 @@ public enum SeatStateChange {
 	public boolean isFree(){
 		return !occupied;
 	}
+	public static SeatStateChange chair(boolean occupied){
+		return occupied?CHAIR_OCCUPIED:CHAIR_FREE;
+	}
+	public static SeatStateChange desk(boolean occupied){
+		return occupied?DESK_OCCUPIED:DESK_FREE;
+	}
 }

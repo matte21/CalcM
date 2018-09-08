@@ -12,9 +12,10 @@ import org.studyroom.statistics.viewmodel.*;
 
 public class Main {
 	public static void main(String[] args){
-		MockKP.getInstance();	//initialize persistence
+		KPStatistics kp=RedSIBKP.getInstance();
+		kp.initPersistence();
 		Statistic.loadStatistics();
-		MockKP.getInstance().start();
+		kp.start();
 		WebServer.setViewModelClass(MainViewModel.class);
 		NanoHTTPD s=WebServer.getInstance();
 		try{

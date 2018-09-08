@@ -7,12 +7,13 @@ import fi.iki.elonen.router.*;
 import org.studyroom.statistics.viewmodel.*;
 
 public class WebServer extends RouterNanoHTTPD {
+	private static final int HTTP_PORT=80,WEB_SOCKET_PORT=82;
 	static final String VIEW_MODEL_KEY="vm";
 	private static Class<? extends IMainViewModel> vmClass;
 	private static WebServer instance;
 	public static WebServer getInstance(){
 		if (instance==null)
-			instance=new WebServer();
+			instance=new WebServer(HTTP_PORT,WEB_SOCKET_PORT);
 		return instance;
 	}
 	public static void setViewModelClass(Class<? extends IMainViewModel> c){
@@ -28,11 +29,11 @@ public class WebServer extends RouterNanoHTTPD {
 	
 	private final SessionManager sm;
 	private final NanoWSD wsServer;
-	private WebServer(){
-		super(80);
+	private WebServer(int httpPort, int wsPort){
+		super(httpPort);
 		addMappings();
 		sm=new SessionManager(3600000,s->((IMainViewModel)s.get(VIEW_MODEL_KEY)).unbind());
-		wsServer=new NanoWSD(82){
+		wsServer=new NanoWSD(wsPort){
 			@Override
 			protected WebSocket openWebSocket(IHTTPSession handshake){
 				return new GraphicPage.Socket(handshake);

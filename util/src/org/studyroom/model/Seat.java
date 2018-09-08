@@ -5,18 +5,18 @@ import java.util.*;
 
 public class Seat implements Serializable {
 	private static final long serialVersionUID=1L;
-	private String URI;
+	private String ID;
 	private String[] features;
 	private boolean cAvailable=true, dAvailable=true;
 	public Seat(String URI){
-		this.URI=URI;
+		this.ID=URI;
 	}
 	public Seat(String URI, String...features){
 		this(URI);
 		this.features=features;
 	}
-	public String getURI(){
-		return URI;
+	public String getID(){
+		return ID;
 	}
 	public String[] getFeatures(){
 		return Arrays.copyOf(features,features.length);
@@ -38,14 +38,14 @@ public class Seat implements Serializable {
 	}
 	@Override
 	public String toString(){
-		return URI;
+		return ID;
 	}
 	@Override
 	public boolean equals(Object o){
-		return o instanceof Seat && ((Seat)o).getURI().equals(URI);
+		return o instanceof Seat && ((Seat)o).getID().equals(ID);
 	}
 	@Override
 	public int hashCode(){
-		return URI.hashCode();
+		return ID.hashCode();
 	}
 }
