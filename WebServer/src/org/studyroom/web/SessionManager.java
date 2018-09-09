@@ -1,4 +1,4 @@
-package org.studyroom.statistics.view.web;
+package org.studyroom.web;
 
 import java.util.*;
 import java.util.concurrent.*;

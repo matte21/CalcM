@@ -1,4 +1,4 @@
-package org.studyroom.statistics.view.web;
+package org.studyroom.web;
 
 import fi.iki.elonen.*;
 import fi.iki.elonen.NanoHTTPD.*;

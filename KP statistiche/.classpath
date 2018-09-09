@@ -4,21 +4,22 @@
 	<classpathentry kind="src" path="rsc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path="/util"/>
-	<classpathentry kind="lib" path="lib/nanohttpd-2.3.1.jar" sourcepath="C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-2.3.1-sources.jar">
+	<classpathentry kind="lib" path="/util/lib/sofia_kp.jar" sourcepath="C:/Users/Riccardo/Documents/Java/lib/SmartM3/src"/>
+	<classpathentry kind="src" path="/WebServer"/>
+	<classpathentry kind="lib" path="/WebServer/lib/nanohttpd-2.3.1.jar" sourcepath="C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-2.3.1-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-2.3.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/nanohttpd-websocket-2.3.1.jar" sourcepath="C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-websocket-2.3.1-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-websocket-2.3.1-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/nanohttpd-nanolets-2.3.1.jar" sourcepath="C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-nanolets-2.3.1-sources.jar">
+	<classpathentry kind="lib" path="/WebServer/lib/nanohttpd-nanolets-2.3.1.jar" sourcepath="C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-nanolets-2.3.1-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-nanolets-2.3.1-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/util/lib/sofia_kp.jar" sourcepath="C:/Users/Riccardo/Documents/Java/lib/SmartM3/src"/>
+	<classpathentry kind="lib" path="/WebServer/lib/nanohttpd-websocket-2.3.1.jar" sourcepath="C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-websocket-2.3.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Riccardo/Documents/Java/lib/nanoHTTPd/nanohttpd-websocket-2.3.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

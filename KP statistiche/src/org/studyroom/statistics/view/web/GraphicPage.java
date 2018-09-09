@@ -1,28 +1,28 @@
 package org.studyroom.statistics.view.web;
 
 import java.beans.*;
-import java.io.*;
 import java.util.*;
 import fi.iki.elonen.NanoHTTPD.*;
 import fi.iki.elonen.NanoWSD.*;
 import fi.iki.elonen.NanoWSD.WebSocketFrame.*;
 import fi.iki.elonen.router.RouterNanoHTTPD.*;
 import org.studyroom.statistics.viewmodel.*;
+import org.studyroom.web.*;
 
 public class GraphicPage extends HTMLPage {
 	@Override
 	public Response get(UriResource uriResource, Map<String,String> urlParams, IHTTPSession request){
 		StringBuilder html=new StringBuilder();
 		Session s=getSession(request);
-		IMainViewModel vm=(IMainViewModel)s.getOrSetDefault(WebServer.VIEW_MODEL_KEY,WebServer::newViewModel);
+		IMainViewModel vm=(IMainViewModel)s.getOrSetDefault(WebApp.VIEW_MODEL_KEY,WebApp::newViewModel);
 		html.append(
 				"<!DOCTYPE html>\n"+
 				"<html>\n"+
 				"	<head>\n"+
 				"		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n"+
 				"		<title>StudyRoom - statistiche</title>\n"+
-				"		<link rel=\"stylesheet\" type=\"text/css\" href=\"rsc/style.css\">\n"+
-				"		<script type=\"text/javascript\" src=\"rsc/script.js\"></script>\n"+
+				"		<link rel=\"stylesheet\" type=\"text/css\" href=\"statistics/rsc/style.css\">\n"+
+				"		<script type=\"text/javascript\" src=\"statistics/rsc/script.js\"></script>\n"+
 				"	</head>\n"+
 				"	<body>\n"+
 				"		<ul id=\"menu\">\n"+
@@ -30,7 +30,7 @@ public class GraphicPage extends HTMLPage {
 				"				<div>Statistiche</div>\n"+
 				"				<ul>\n");
 		for (String st : vm.getStatistics())
-			html.append("					<li><a href=\"javascript:selectStatistic('"+st+"')\">"+st+"</a></li>\n");
+			html.append("					<li><a href=\"javascript:selectStatistic('"+st.replace("'","\\'")+"')\">"+st+"</a></li>\n");
 		html.append(
 				"				</ul>\n"+
 				"			</li>\n"+
@@ -42,9 +42,9 @@ public class GraphicPage extends HTMLPage {
 					"					<li class=\"submenu\">"+
 					"						<div>"+u+"</div>\n"+
 					"						<ul>\n"+
-					"							<li><a href=\"javascript:selectStudyRoom('"+IMainViewModel.DEFAULT_SR+";university="+u+"')\">"+IMainViewModel.DEFAULT_SR+"</a></li>\n");
+					"							<li><a href=\"javascript:selectStudyRoom('"+IMainViewModel.DEFAULT_SR+";university="+u.replace("'","\\'")+"')\">"+IMainViewModel.DEFAULT_SR+"</a></li>\n");
 			for (String sr : vm.getStudyRooms(u))
-				html.append("							<li><a href=\"javascript:selectStudyRoom('"+sr+";university="+u+"')\">"+sr+"</a></li>\n");
+				html.append("							<li><a href=\"javascript:selectStudyRoom('"+sr.replace("'","\\'")+";university="+u.replace("'","\\'")+"')\">"+sr+"</a></li>\n");
 			html.append(
 					"						</ul>\n"+
 					"					</li>\n");
@@ -133,24 +133,17 @@ public class GraphicPage extends HTMLPage {
 		html.append("		</table>");
 		return html.toString();
 	}
-	public static class Socket extends WebSocket{
+	public static class Socket extends WebSocketHandler {
 		private Session s;
 		private IMainViewModel vm;
 		private PropertyChangeListener l=e->update();
-		public Socket(IHTTPSession handshakeRequest){
-			super(handshakeRequest);
-			s=getSession(handshakeRequest);
-			vm=(IMainViewModel)s.getOrSetDefault(WebServer.VIEW_MODEL_KEY,WebServer::newViewModel);
-		}
 		private void update(){
-			try{
-				send(getGraphic(vm));
-			} catch (IOException e){
-				e.printStackTrace();
-			}
+			send(getGraphic(vm));
 		}
 		@Override
 		protected void onOpen(){
+			s=getSession();
+			vm=(IMainViewModel)s.getOrSetDefault(WebApp.VIEW_MODEL_KEY,WebApp::newViewModel);
 			vm.addPropertyChangeListener(l);
 		}
 		@Override
@@ -201,19 +194,6 @@ public class GraphicPage extends HTMLPage {
 				return;
 			}
 			update();
-		}
-		@Override
-		protected void onPong(WebSocketFrame pong){
-			s.access();
-			try{
-				ping(pong.getBinaryPayload());
-			} catch (IOException e){
-				e.printStackTrace();
-			}
-		}
-		@Override
-		protected void onException(IOException e){
-			e.printStackTrace();
 		}
 	}
 }

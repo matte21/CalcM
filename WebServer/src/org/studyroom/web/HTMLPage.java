@@ -1,10 +1,11 @@
-package org.studyroom.statistics.view.web;
+package org.studyroom.web;
 
 import java.util.*;
 import java.util.stream.*;
 import fi.iki.elonen.*;
 import fi.iki.elonen.NanoHTTPD.*;
 import fi.iki.elonen.NanoHTTPD.Response.*;
+import fi.iki.elonen.NanoWSD.*;
 import fi.iki.elonen.router.RouterNanoHTTPD.*;
 
 /**Base class for every HTML page.<br>
@@ -18,7 +19,7 @@ public abstract class HTMLPage implements UriResponder {
 		for (IStatus s : st)
 			errorHandlers.put(s,h);
 	}
-	protected Response getErrorResponse(IStatus error){
+	protected static Response getErrorResponse(IStatus error){
 		return errorHandlers.getOrDefault(error,ErrorHandler.DEFAULT).createErrorResponse(error);
 	}
 	protected Response getHTMLResponse(String html){

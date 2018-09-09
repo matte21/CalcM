@@ -1,4 +1,4 @@
-package org.studyroom.statistics.view.web;
+package org.studyroom.web;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -8,7 +8,7 @@ import java.util.stream.*;
 public class Session implements Iterable<Map.Entry<String,Object>> {
 	private Map<String,Object> m=new ConcurrentHashMap<>();
 	private long lastAccess=System.currentTimeMillis();
-	void access(){
+	public void access(){
 		lastAccess=System.currentTimeMillis();
 	}
 	public long getLastAccessTime(){

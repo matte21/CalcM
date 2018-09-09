@@ -1,0 +1,6 @@
+PREFIX sr:<http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#>
+PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+INSERT DATA {
+	sr:IT_BO_AlmaMater	rdf:type sr:University;
+						sr:hasName "Alma Mater Studiorum - Universita' di Bologna"
+}

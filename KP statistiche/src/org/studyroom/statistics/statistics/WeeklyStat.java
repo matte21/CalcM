@@ -37,6 +37,7 @@ public class WeeklyStat extends PeriodicStatistic {
 			try {
 				int d=Integer.parseInt(k.split("_")[1]);
 				Map<Integer,List<IntValue>> m=val.get(sr);
+				if (m==null) return;//throw new IllegalStateException("Unknown study room: "+sr);
 				m.putIfAbsent(d,new ArrayList<>());
 				String[] vs=v.split("_");
 				m.get(d).add(new IntValue(Integer.parseInt(vs[0]),Integer.parseInt(vs[1])));
