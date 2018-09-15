@@ -1,4 +1,4 @@
-package org.studyroom;
+package org.studyroom.kp;
 
 import java.io.*;
 import java.util.*;
@@ -8,8 +8,14 @@ import org.jdom2.input.*;
 import sofia_kp.*;
 
 public class SIBUtils {
+	private static final Map<String,String> ns=new HashMap<>();
+	
+	//START application specific data:
 	public static final String SMART_SPACE_NAME="StudyRoom";
-	static final Map<String,String> ns=new HashMap<>();
+	static {
+		initNamespaces(SIBUtils.class.getResourceAsStream("/ontology.owl"));
+	}
+	//END application specific data
 	
 	public static String getNS(String pref){
 		return ns.getOrDefault(pref,"");
@@ -111,7 +117,8 @@ public class SIBUtils {
 	}
 	
 	/**Shortcut method to get the result list from a SPARQL query.
-	 * To access each value of a result, use {@code SSAP_sparql_response.getCellValue()} method.
+	 * To access each value of a result, use the {@link SSAP_sparql_response.getCellValue()} function
+	 * or the {@code getID()}, {@code getInt()} and {@code getString()} functions.
 	 * @param sib - the SIB to which send the query
 	 * @param query - the SPARQL query
 	 * @return the results list */
@@ -152,8 +159,29 @@ public class SIBUtils {
 		return Arrays.stream(namespacePref).map(p->"PREFIX "+p+":<"+getNS(p)+">").collect(Collectors.joining("\n","","\n"));
 	}
 	
-	/**undo char transforms maked by the KP before sending message*/
+	/**undo char transforms maked by the KP before sending message */
 	public static String decodeXMLChars(String s){
 		return s.replaceAll("&lt;","<").replaceAll("&gt;",">").replaceAll("&apos;","'").replaceAll("&quot;","\"").replaceAll("&amp;","&");
+	}
+	
+	/**@return the ID of the URI at position {@code pos} of a query result */
+	public static String getID(List<String[]> result, int pos){
+		return removeNS(SSAP_sparql_response.getCellValue(result.get(pos)));
+	}
+	
+	/**@return the value at position {@code pos} of a query result */
+	public static String getString(List<String[]> result, int pos){
+		return decodeXMLChars(SSAP_sparql_response.getCellValue(result.get(pos)));
+	}
+	
+	/**@return the value at position {@code pos} of a query result */
+	public static int getInt(List<String[]> result, int pos){
+		return Integer.parseInt(decodeXMLChars(SSAP_sparql_response.getCellValue(result.get(pos))));
+	}
+	
+	/**Removes the namespace from the URI */
+	public static String removeNS(String uri){
+		int i=uri.indexOf("#");
+		return i<0?uri:uri.substring(i+1);
 	}
 }

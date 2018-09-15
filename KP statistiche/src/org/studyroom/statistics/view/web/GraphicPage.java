@@ -14,7 +14,7 @@ public class GraphicPage extends HTMLPage {
 	public Response get(UriResource uriResource, Map<String,String> urlParams, IHTTPSession request){
 		StringBuilder html=new StringBuilder();
 		Session s=getSession(request);
-		IMainViewModel vm=(IMainViewModel)s.getOrSetDefault(WebApp.VIEW_MODEL_KEY,WebApp::newViewModel);
+		IGraphicViewModel vm=(IGraphicViewModel)s.getOrSetDefault(WebApp.VIEW_MODEL_KEY,WebApp::newViewModel);
 		html.append(
 				"<!DOCTYPE html>\n"+
 				"<html>\n"+
@@ -42,7 +42,7 @@ public class GraphicPage extends HTMLPage {
 					"					<li class=\"submenu\">"+
 					"						<div>"+u+"</div>\n"+
 					"						<ul>\n"+
-					"							<li><a href=\"javascript:selectStudyRoom('"+IMainViewModel.DEFAULT_SR+";university="+u.replace("'","\\'")+"')\">"+IMainViewModel.DEFAULT_SR+"</a></li>\n");
+					"							<li><a href=\"javascript:selectStudyRoom('"+IGraphicViewModel.DEFAULT_SR+";university="+u.replace("'","\\'")+"')\">"+IGraphicViewModel.DEFAULT_SR+"</a></li>\n");
 			for (String sr : vm.getStudyRooms(u))
 				html.append("							<li><a href=\"javascript:selectStudyRoom('"+sr.replace("'","\\'")+";university="+u.replace("'","\\'")+"')\">"+sr+"</a></li>\n");
 			html.append(
@@ -75,7 +75,7 @@ public class GraphicPage extends HTMLPage {
 //			s.put(VIEW_MODEL,WebServer.newViewModel());
 //		return (IMainViewModel)s.get(VIEW_MODEL);
 //	}
-	private static String getGraphic(IMainViewModel vm){
+	private static String getGraphic(IGraphicViewModel vm){
 		final int W=1000,H=600;
 		StringBuilder html=new StringBuilder();
 		html.append(
@@ -135,7 +135,7 @@ public class GraphicPage extends HTMLPage {
 	}
 	public static class Socket extends WebSocketHandler {
 		private Session s;
-		private IMainViewModel vm;
+		private IGraphicViewModel vm;
 		private PropertyChangeListener l=e->update();
 		private void update(){
 			send(getGraphic(vm));
@@ -143,7 +143,7 @@ public class GraphicPage extends HTMLPage {
 		@Override
 		protected void onOpen(){
 			s=getSession();
-			vm=(IMainViewModel)s.getOrSetDefault(WebApp.VIEW_MODEL_KEY,WebApp::newViewModel);
+			vm=(IGraphicViewModel)s.getOrSetDefault(WebApp.VIEW_MODEL_KEY,WebApp::newViewModel);
 			vm.addPropertyChangeListener(l);
 		}
 		@Override

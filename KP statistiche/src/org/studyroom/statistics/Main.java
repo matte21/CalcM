@@ -16,7 +16,7 @@ public class Main {
 		kp.initPersistence();
 		Statistic.loadStatistics();
 		kp.start();
-		WebApp.setViewModelClass(MainViewModel.class);
+		WebApp.setViewModelClass(GraphicViewModel.class);
 		WebApp.init();
 		WebServer s=WebServer.getInstance();
 		if (!s.wasStarted())
@@ -26,7 +26,7 @@ public class Main {
 				e.printStackTrace();
 			}
 		if (SystemTray.isSupported()){
-			App.setViewModelClass(MainViewModel.class);
+			App.setViewModelClass(GraphicViewModel.class);
 			new Thread(()->App.launch(App.class)).start();
 			TrayIcon ic=new TrayIcon(new BufferedImage(30,30,BufferedImage.TYPE_INT_RGB),"StudyRoom - Visualizza statistiche");
 			ic.setImageAutoSize(true);

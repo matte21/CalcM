@@ -3,7 +3,7 @@ package org.studyroom.statistics.viewmodel;
 import java.beans.*;
 import java.util.*;
 
-public interface IMainViewModel {
+public interface IGraphicViewModel {
 	//for generic view-model
 	void addPropertyChangeListener(PropertyChangeListener l);
 	void removePropertyChangeListener(PropertyChangeListener l);

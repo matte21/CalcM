@@ -1,4 +1,4 @@
-package org.studyroom.statistics.viewmodel;
+package org.studyroom.viewmodel;
 
 import java.beans.*;
 
@@ -11,12 +11,6 @@ public class ViewModel {
         ps.removePropertyChangeListener(l);
     }
 	protected void firePropertyChange(String propertyName, Object oldValue, Object newValue){
-		ps.firePropertyChange(propertyName,oldValue,newValue);
-	}
-	protected void firePropertyChange(String propertyName, int oldValue, int newValue){
-		ps.firePropertyChange(propertyName,oldValue,newValue);
-	}
-	protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue){
 		ps.firePropertyChange(propertyName,oldValue,newValue);
 	}
 	protected void fireListInsertion(String propertyName, Object newValue, int index){

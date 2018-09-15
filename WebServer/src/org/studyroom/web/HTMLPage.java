@@ -5,7 +5,6 @@ import java.util.stream.*;
 import fi.iki.elonen.*;
 import fi.iki.elonen.NanoHTTPD.*;
 import fi.iki.elonen.NanoHTTPD.Response.*;
-import fi.iki.elonen.NanoWSD.*;
 import fi.iki.elonen.router.RouterNanoHTTPD.*;
 
 /**Base class for every HTML page.<br>

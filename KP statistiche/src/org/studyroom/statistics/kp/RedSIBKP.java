@@ -3,10 +3,10 @@ package org.studyroom.statistics.kp;
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
-import org.studyroom.*;
 import org.studyroom.model.*;
 import org.studyroom.statistics.persistence.*;
 import sofia_kp.*;
+import static org.studyroom.kp.SIBUtils.*;
 
 public class RedSIBKP extends KPStatistics {
 	private static final String SIB_HOST="localhost";
@@ -19,8 +19,7 @@ public class RedSIBKP extends KPStatistics {
 		return instance;
 	}
 	private RedSIBKP(){
-		sib=new KPICore(SIB_HOST,SIB_PORT,SIBUtils.SMART_SPACE_NAME);
-		SIBUtils.initNamespaces(getClass().getResourceAsStream("/ontology.owl"));
+		sib=new KPICore(SIB_HOST,SIB_PORT,SMART_SPACE_NAME);
 		sib.setProtocol_version(1);
 		//sib.enable_debug_message();//XXX
 		sib.enable_error_message();//XXX
@@ -28,13 +27,13 @@ public class RedSIBKP extends KPStatistics {
 		if (r==null)
 			throw new UncheckedIOException("No response",new IOException());
 		if (!r.isConfirmed()){
-			SIBUtils.printSIBResponse(r);
+			printSIBResponse(r);
 			System.exit(1);
 		}
 	}
 	@Override
 	protected KPPersistence createPersistence(){
-		StudyRoom[] lsr=SIBUtils.query(sib,SIBUtils.sparqlPrefix("sr","rdf")+"SELECT ?sr ?n ?u ?c WHERE {"
+		StudyRoom[] lsr=query(sib,sparqlPrefix("sr","rdf")+"SELECT ?sr ?n ?u ?c WHERE {"
 				+ "?sr rdf:type sr:StudyRoom;"
 				+ "		sr:hasName ?n;"
 				+ "		sr:hasCapacity ?c;"
@@ -45,7 +44,7 @@ public class RedSIBKP extends KPStatistics {
 	}
 	@Override
 	public void start(){
-		for (List<String[]> r : SIBUtils.query(sib,SIBUtils.sparqlPrefix("sr","rdf")+"SELECT ?sr ?t ?s ?chairState ?deskState WHERE {"
+		for (List<String[]> r : query(sib,sparqlPrefix("sr","rdf")+"SELECT ?sr ?t ?s ?chairState ?deskState WHERE {"
 				+ "?sr rdf:type sr:StudyRoom;"
 				+ "		sr:table ?t."
 				+ "?t rdf:type sr:Table;"
@@ -62,18 +61,18 @@ public class RedSIBKP extends KPStatistics {
 			if (deskOccupied)
 				getPersistence().initState(seatID,tableID,studyRoomID,SeatStateChange.DESK_OCCUPIED,SeatStateChange.chair(chairOccupied));
 		}
-		sib.subscribeSPARQL(SIBUtils.sparqlPrefix("sr","rdf")+"SELECT ?seat ?state WHERE {"
+		sib.subscribeSPARQL(sparqlPrefix("sr","rdf")+"SELECT ?seat ?state WHERE {"
 				+ "?seat rdf:type sr:Seat;"
 				+ "		sr:hasChairSensor ?cs."
 				+ "?cs sr:hasValue ?state}",new PublishEventHandler(this::onChairSensorChange));
-		sib.subscribeSPARQL(SIBUtils.sparqlPrefix("sr","rdf")+"SELECT ?seat ?state WHERE {"
+		sib.subscribeSPARQL(sparqlPrefix("sr","rdf")+"SELECT ?seat ?state WHERE {"
 				+ "?seat rdf:type sr:Seat;"
 				+ "		sr:hasTableSensor ?ts."
 				+ "?ts sr:hasValue ?state}",new PublishEventHandler(this::onDeskSensorChange));
 	}
 	private void onChairSensorChange(List<String[]> result){
 		String seatID=getID(result,0);
-		List<String[]> r=SIBUtils.query(sib,SIBUtils.sparqlPrefix("sr","rdf")+"SELECT ?sr ?t ?state WHERE {"
+		List<String[]> r=query(sib,sparqlPrefix("sr","rdf")+"SELECT ?sr ?t ?state WHERE {"
 				+ "?sr rdf:type sr:StudyRoom;"
 				+ "		sr:table ?t."
 				+ "?t rdf:type sr:Table;"
@@ -84,7 +83,7 @@ public class RedSIBKP extends KPStatistics {
 	}
 	private void onDeskSensorChange(List<String[]> result){
 		String seatID=getID(result,0);
-		List<String[]> r=SIBUtils.query(sib,SIBUtils.sparqlPrefix("sr","rdf")+"SELECT ?sr ?t ?state WHERE {"
+		List<String[]> r=query(sib,sparqlPrefix("sr","rdf")+"SELECT ?sr ?t ?state WHERE {"
 				+ "?sr rdf:type sr:StudyRoom;"
 				+ "		sr:table ?t."
 				+ "?t rdf:type sr:Table;"
@@ -94,35 +93,13 @@ public class RedSIBKP extends KPStatistics {
 		getPersistence().notifyChange(seatID,getID(r,1),getID(r,0),SeatStateChange.desk(isSomethingDetected(getString(result,1))),SeatStateChange.chair(isSomethingDetected(getString(r,2))));
 	}
 	
-	/**@return the ID of the URI at position {@code pos}*/
-	private static String getID(List<String[]> result, int pos){
-		return removeNS(SSAP_sparql_response.getCellValue(result.get(pos)));
-	}
-	
-	/**@return the value at position {@code pos}*/
-	private static String getString(List<String[]> result, int pos){
-		return SIBUtils.decodeXMLChars(SSAP_sparql_response.getCellValue(result.get(pos)));
-	}
-	
-	/**@return the value at position {@code pos}*/
-	private static int getInt(List<String[]> result, int pos){
-		return Integer.parseInt(SIBUtils.decodeXMLChars(SSAP_sparql_response.getCellValue(result.get(pos))));
-	}
-	
 	/**@return whether the value is {@code sr:somethingDetected}*/
 	private static boolean isSomethingDetected(String value){
-		return value.equals(SIBUtils.getNS("sr")+"somethingDetected");
-	}
-	
-	/**Removes the namespace from the URI*/
-	private static String removeNS(String uri){
-		int i=uri.indexOf("#");
-		return i<0?uri:uri.substring(i+1);
+		return value.equals(getNS("sr")+"somethingDetected");
 	}
 	
 	/**Usefull class to create a subscribeHandler with a functional interface.
-	 * For each new result published, the handler calls the {@code onPublish} function.
-	 */
+	 * For each new result published, the handler calls the {@code onPublish} function.*/
 	private class PublishEventHandler implements iKPIC_subscribeHandler2 {
 		private Consumer<List<String[]>> onPublish;
 		public PublishEventHandler(Consumer<List<String[]>> onPublish){

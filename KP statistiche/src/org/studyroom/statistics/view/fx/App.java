@@ -6,9 +6,9 @@ import javafx.stage.*;
 import org.studyroom.statistics.viewmodel.*;
 
 public class App extends Application {
-	private static Class<? extends IMainViewModel> vmClass;
+	private static Class<? extends IGraphicViewModel> vmClass;
 	private static App instance;
-	public static void setViewModelClass(Class<? extends IMainViewModel> c){
+	public static void setViewModelClass(Class<? extends IGraphicViewModel> c){
 		vmClass=c;
 	}
 	public static void show(){
@@ -23,8 +23,8 @@ public class App extends Application {
 	private void preapreWindow(Stage w){
 		w.setTitle("StudyRoom - Statistiche");
 		try{
-			IMainViewModel vm=vmClass.newInstance();
-			w.setScene(new Scene(new MainView(vm)));
+			IGraphicViewModel vm=vmClass.newInstance();
+			w.setScene(new Scene(new GraphicView(vm)));
 			w.setOnHidden(e->{
 				vm.unbind();
 				w.setScene(null);

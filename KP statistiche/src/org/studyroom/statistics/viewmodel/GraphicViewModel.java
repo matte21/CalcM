@@ -6,8 +6,9 @@ import org.studyroom.model.*;
 import org.studyroom.statistics.persistence.*;
 import org.studyroom.statistics.statistics.*;
 import org.studyroom.statistics.statistics.Statistic.*;
+import org.studyroom.viewmodel.*;
 
-public class MainViewModel extends ViewModel implements IMainViewModel {
+public class GraphicViewModel extends ViewModel implements IGraphicViewModel {
 	private Statistic statistic;
 	private List<StudyRoom> selectedSR=new ArrayList<>();
 	private String graphicTitle;
@@ -21,7 +22,7 @@ public class MainViewModel extends ViewModel implements IMainViewModel {
 	private Map<String,List<Double>> cacheData;
 	private boolean init,cacheValid;
 	
-	public MainViewModel(){
+	public GraphicViewModel(){
 		visualizations.put("tutto",Visualization.BOTH);
 		visualizations.put("posti totalmente occupati",Visualization.FULL);
 		visualizations.put("posti parzialmente occupati",Visualization.PARTIAL);

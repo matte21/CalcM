@@ -7,10 +7,11 @@ import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.stage.*;
 import org.studyroom.statistics.viewmodel.*;
+import org.studyroom.view.*;
 
-public class MainView extends BorderPane {
-	private IMainViewModel viewModel;
-	public MainView(IMainViewModel vm){
+public class GraphicView extends BorderPane {
+	private IGraphicViewModel viewModel;
+	public GraphicView(IGraphicViewModel vm){
 		viewModel=vm;
 		MenuItem aot=new MenuItem("Sempre in primo piano");
 		MenuItem not=new MenuItem("Sblocca");
@@ -31,7 +32,7 @@ public class MainView extends BorderPane {
 					m.setOnAction(e->this.viewModel.selectStatistic(s));
 					return m;
 				}).toArray(MenuItem[]::new)),
-				new Menu("Aula",null,vm.getUniversities().stream().map(u->new Menu(u,null,Stream.concat(Stream.of(IMainViewModel.DEFAULT_SR),vm.getStudyRooms(u).stream()).map(s->{
+				new Menu("Aula",null,vm.getUniversities().stream().map(u->new Menu(u,null,Stream.concat(Stream.of(IGraphicViewModel.DEFAULT_SR),vm.getStudyRooms(u).stream()).map(s->{
 					MenuItem m=new MenuItem(s);
 					m.setOnAction(e->this.viewModel.selectStudyRoom(s,u));
 					return m;

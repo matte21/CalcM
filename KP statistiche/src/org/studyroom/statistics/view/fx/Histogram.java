@@ -7,6 +7,7 @@ import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.scene.chart.*;
 import javafx.util.*;
+import org.studyroom.view.*;
 
 public class Histogram extends StackedBarChart<String,Number> {
 	private final ObjectProperty<Object> vm=new SimpleObjectProperty<>();
