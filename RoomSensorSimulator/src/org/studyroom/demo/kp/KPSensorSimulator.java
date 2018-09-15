@@ -51,23 +51,26 @@ public class KPSensorSimulator {
 						kps.add(new KPChairSensor(sib,s.getChairSensorID(),s.getChairSensor()));
 						kps.add(new KPTableSensor(sib,s.getTableSensorID(),s.getTableSensor()));
 					}).collect(Collectors.toMap(Seat::getID,Function.identity()));
+			//We assume in this simulation that seats are on a streight line, so there is a first one and a last one
 			List<SensorSeat> s=new ArrayList<>(ms.size());
 			if (ms.size()<3)
 				s.addAll(ms.values());
 			else {
-				List<Vector<String[]>> sSingle=query(sib,sparqlPrefix("sr")+"SELECT ?s1 AS ?s WHERE {"
-						+ "sr:"+tID+" sr:seat ?s1, ?s2."
+				//Let's find first and last seat
+				List<Vector<String[]>> sSingle=query(sib,sparqlPrefix("sr")+"SELECT ?s1 (COUNT(*) AS ?c) WHERE {"
+						+ "sr:"+tID+" sr:seat ?s1, ?s2."	//XXX if there isn't any aggregate function in the SELECT clause, GROUP BY doesn't work
 						+ "?s1 sr:near ?s2}"
-						+ "GROUP BY ?s1"
-						+ "HAVING (COUNT(?s1) = 1)");
+						+ "GROUP BY ?s1 "	//leave space before '"'!!
+						+ "HAVING (COUNT(*) = 1)");
 				if (sSingle.size()!=2)
-					throw new IllegalStateException("Simulation constraint not respected: seats are not on a straight line.");
+					throw new IllegalStateException("Simulation constraint not respected: seats are not on a straight line ("+sSingle.size()+" single seats).");
 				String sfID=getID(sSingle.get(0),0), slID=getID(sSingle.get(1),0), s0ID, s1ID=sfID, s2ID;
 				s.add(ms.get(sfID));
 				s2ID=getID(query(sib,sparqlPrefix("sr")+"SELECT ?s WHERE {"
 						+ "sr:"+tID+" sr:seat ?s."
 						+ "sr:"+sfID+" sr:near ?s}").get(0),0);
 				s.add(ms.get(s2ID));
+				System.out.println(s);
 				do {
 					s0ID=s1ID;
 					s1ID=s2ID;
@@ -76,7 +79,8 @@ public class KPSensorSimulator {
 							+ "sr:"+s1ID+" sr:near ?s."
 							+ "FILTER(?s != sr:"+s0ID+")}").get(0),0);
 					s.add(ms.get(s2ID));
-				} while (s2ID!=sfID);
+					System.out.println(s);
+				} while (!s2ID.equals(slID));
 			}
 			t.add(new Table(tID,s.toArray(new Seat[s.size()])));
 		}

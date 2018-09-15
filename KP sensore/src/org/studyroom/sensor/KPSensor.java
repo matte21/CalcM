@@ -36,7 +36,11 @@ public abstract class KPSensor implements Observer {
 			System.err.println("Sensor "+id+": update refused ("+r.Status+")");
 			return;
 		}
-		r=sib.querySPARQL(sparqlPrefix("sr")+"REMOVE DATA {sr:"+id+" sr:hasValue sr:"+(s.isOn()?"nothingDetected":"somethingDetected")+"}");
+		r=sib.querySPARQL(sparqlPrefix("sr")+"DELETE DATA {sr:"+id+" sr:hasValue sr:"+(s.isOn()?"nothingDetected":"somethingDetected")+"}");
+		if (!r.isConfirmed()){
+			System.err.println("Sensor "+id+": inconsistent state: remove refused ("+r.Status+")");
+			return;
+		}
 	}
 	
 	@Override
