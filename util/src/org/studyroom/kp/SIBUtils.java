@@ -166,6 +166,7 @@ public class SIBUtils {
 	
 	/**@return the ID of the URI at position {@code pos} of a query result */
 	public static String getID(List<String[]> result, int pos){
+		//System.out.println(Arrays.toString(result.get(pos)));//XXX
 		return removeNS(SSAP_sparql_response.getCellValue(result.get(pos)));
 	}
 	
