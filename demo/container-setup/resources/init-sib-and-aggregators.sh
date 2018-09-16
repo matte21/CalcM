@@ -20,5 +20,14 @@ sleep 10s
 # Load the ontology and the test dataset into the SIB. These variables MUST have been already set (for instance in the Dockerfile).
 ./ontologyLoader/bin/ConfigurableJenaBasedOntologyLoader "$sib_host" "$sib_port" "$smartspace_name" "$ontology_and_demo_dataset_url"
 
+# Wait for the ontology to have been correctly inserted
+sleep 10s
+
+# Start room state (open/closed) aggregator. TODO: wrap this call into a script
+java -cp RoomStateManager.jar opening.hours.launcher.RoomStateManagerLauncher "$sib_host" "$sib_port" "$smartspace_name" \
+                                                                              "$ontology_prefix" "$opening_hours_dir"
+
+# Start seats aggregator
+
 # Command to keep the container running. Otherwise it stops after the ontology gets inserted. This is only a temporary, quick and dirty solution.
 tail -f /dev/null

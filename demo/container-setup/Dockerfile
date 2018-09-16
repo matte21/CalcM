@@ -1,3 +1,7 @@
+# TODO: this file has been written incrementally as the artifacts that it copies to the docker container were developed.
+# Thus, it's quite chaotic. A better refactoring should be done (es. group all the COPY directives into a single one, since
+# all the resources that are copied are in the same directory).
+
 # Use Ubuntu 12.04 as the base image because it is the Ubuntu distro the SIB version used in this container was tested on
 FROM ubuntu:12.04
 
@@ -59,6 +63,19 @@ ENV sib_host=localhost
 ENV sib_port=10010
 ENV smartspace_name=demo-smartspace 
 ENV ontology_and_demo_dataset_url=file:///calcm-demo/ontologyLoader/ontology-and-demo-dataset.owl
+ENV ontology_prefix=http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#
+ENV opening_hours_dir=opening-hours-dir 
+
+# Copy the files containig the opening hours of the rooms in the demo dataset, make them readable and remove the archive used to ship them to the
+# container
+RUN mkdir -p $opening_hours_dir
+COPY resources/openingHours.tar.gz ./$opening_hours_dir
+RUN tar -xzf ./$opening_hours_dir/openingHours.tar.gz && \
+    rm -f ./$opening_hours_dir/openingHours.tar.gz && \
+    chmod a+r ./$opening_hours_dir/* 
+
+# Copy the jar file of the room state (open/closed) manager
+COPY resources/RoomStateManager.jar .
 
 # Expose port where the SIB will listen for tcp connections
 EXPOSE $sib_port
