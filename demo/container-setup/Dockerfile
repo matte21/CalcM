@@ -70,7 +70,7 @@ ENV opening_hours_dir=opening-hours-dir
 # container
 RUN mkdir -p $opening_hours_dir
 COPY resources/openingHours.tar.gz ./$opening_hours_dir
-RUN tar -xzf ./$opening_hours_dir/openingHours.tar.gz && \
+RUN tar -xzf ./$opening_hours_dir/openingHours.tar.gz -C ./$opening_hours_dir/ && \
     rm -f ./$opening_hours_dir/openingHours.tar.gz && \
     chmod a+r ./$opening_hours_dir/* 
 
