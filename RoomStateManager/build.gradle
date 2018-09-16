@@ -1,5 +1,5 @@
 apply plugin: 'eclipse'
-apply plugin: 'java'
+apply plugin: 'application'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -25,3 +25,12 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'
 }
 
+mainClassName = "opening.hours.launcher.RoomStateManagerLauncher"
+
+distTar {
+	baseName = 'roomStateManager'
+    into(baseName) {
+        from '.'
+        include 'src/main/resources/log4j2.properties' 
+    }
+}

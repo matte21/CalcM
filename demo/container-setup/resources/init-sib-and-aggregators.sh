@@ -23,9 +23,8 @@ sleep 10s
 # Wait for the ontology to have been correctly inserted
 sleep 10s
 
-# Start room state (open/closed) aggregator. TODO: wrap this call into a script
-java -cp RoomStateManager.jar opening.hours.launcher.RoomStateManagerLauncher "$sib_host" "$sib_port" "$smartspace_name" \
-                                                                              "$ontology_prefix" "$opening_hours_dir"
+# Start room state (open/closed) aggregator.
+./roomStateManager/bin/RoomStateManager "$sib_host" "$sib_port" "$smartspace_name" "$ontology_prefix" "$opening_hours_dir"
 
 # Start seats aggregator
 

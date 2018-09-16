@@ -74,8 +74,11 @@ RUN tar -xzf ./$opening_hours_dir/openingHours.tar.gz -C ./$opening_hours_dir/ &
     rm -f ./$opening_hours_dir/openingHours.tar.gz && \
     chmod a+r ./$opening_hours_dir/* 
 
-# Copy the jar file of the room state (open/closed) manager
-COPY resources/RoomStateManager.jar .
+# Copy the binary distribution of the room state (open/closed) manager
+COPY resources/roomStateManager.tar .
+RUN tar -xf roomStateManager.tar && \
+    chmod u+x roomStateManager/bin/RoomStateManager && \
+    rm roomStateManager.tar
 
 # Expose port where the SIB will listen for tcp connections
 EXPOSE $sib_port
