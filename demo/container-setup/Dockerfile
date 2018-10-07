@@ -65,6 +65,8 @@ ENV smartspace_name=demo-smartspace
 ENV ontology_and_demo_dataset_url=file:///calcm-demo/ontologyLoader/ontology-and-demo-dataset.owl
 ENV ontology_prefix=http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#
 ENV opening_hours_dir=opening-hours-dir 
+ENV query_web_server_port=80
+ENV query_web_server_websocket_port=82
 
 # Copy the files containig the opening hours of the rooms in the demo dataset, make them readable and remove the archive used to ship them to the
 # container
@@ -80,12 +82,18 @@ RUN tar -xf roomStateManager.tar && \
     chmod u+x roomStateManager/bin/RoomStateManager && \
     rm roomStateManager.tar
 
+# Copy the distribution (executable and all needed resources) of the Query web server AKA the frontend clients will talk to
+COPY resources/queryWebServer.tar . 
+RUN tar -xf queryWebServer.tar && \
+    chmod u+x queryWebServer/bin/QueryWebServer && \
+    rm queryWebServer.tar
+
 # Expose port where the SIB will listen for tcp connections
 EXPOSE $sib_port
 
-# When the container is started, the script init-sib-and-aggregators.sh is executed.
-ENTRYPOINT ["/calcm-demo/init-sib-and-aggregators.sh"] 
+# Expose port where the WEB server will listen for normal HTTP connections and WebSocket connections
+EXPOSE $query_web_server_port
+EXPOSE $query_web_server_websocket_port
 
-######################################
-#              v0.8.6                #
-######################################
+# When the container is started, the script init-sib-and-aggregators.sh is executed.
+ENTRYPOINT ["/calcm-demo/init-sib-and-aggregators.sh"]

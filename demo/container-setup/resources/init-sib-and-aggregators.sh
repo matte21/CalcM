@@ -24,9 +24,13 @@ sleep 10s
 sleep 10s
 
 # Start room state (open/closed) aggregator.
-./roomStateManager/bin/RoomStateManager "$sib_host" "$sib_port" "$smartspace_name" "$ontology_prefix" "$opening_hours_dir"
+./roomStateManager/bin/RoomStateManager "$sib_host" "$sib_port" "$smartspace_name" "$ontology_prefix" "$opening_hours_dir" &
 
 # Start seats aggregator
+# TODO
+
+# Start query web server
+./queryWebServer/bin/QueryWebServer "$sib_host" "$sib_port" "$smartspace_name" 
 
 # Command to keep the container running. Otherwise it stops after the ontology gets inserted. This is only a temporary, quick and dirty solution.
 tail -f /dev/null
