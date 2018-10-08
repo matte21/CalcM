@@ -6,6 +6,7 @@ import org.studyroom.web.Session;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import query.server.exceptions.SIBConnectionErrorException;
 import query.server.utils.SibConnectionFactory;
+import query.server.utils.query.builder.PrefixedQueryUtilsFactory;
 
 public abstract class SIBFacingHandler extends HTMLPage {
 	
@@ -19,6 +20,10 @@ public abstract class SIBFacingHandler extends HTMLPage {
 				e.printStackTrace();
 				return null;
 			}
+		}
+		
+		if (!session.containsKey("queryUtilsFactory")) {
+			session.set("queryUtilsFactory", PrefixedQueryUtilsFactory.getInstance());		
 		}
 		
 		return session;
