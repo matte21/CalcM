@@ -1,40 +1,42 @@
 package org.studyroom.statistics.persistence;
 
+import org.studyroom.model.*;
+
 public class SeatStateChangedEvent {
-	private final String seat,table,studyRoom;
-	private final SeatStateChange change,other;
+	private final Seat seat;
+	private final SeatStateChange change;
 	private final boolean init;
-	public SeatStateChangedEvent(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
-		this(seatID,tableID,studyRoomID,change,other,false);
+	public SeatStateChangedEvent(Seat seat, SeatStateChange change){
+		this(seat,change,false);
 	}
-	public SeatStateChangedEvent(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other, boolean initEvent){
-		seat=seatID;
-		table=tableID;
-		studyRoom=studyRoomID;
+	public SeatStateChangedEvent(Seat seat, SeatStateChange change, boolean initEvent){
+		this.seat=seat;
 		this.change=change;
-		this.other=other;
 		init=initEvent;
 	}
-	public String getSeatID(){
+	public Seat getSeat(){
 		return seat;
 	}
+	public String getSeatID(){
+		return seat.getID();
+	}
 	public String getTableID(){
-		return table;
+		return seat.getTable().getID();
 	}
 	public String getStudyRoomID(){
-		return studyRoom;
+		return seat.getTable().getStudyRoom().getID();
 	}
 	public SeatStateChange getChange(){
 		return change;
 	}
 	public boolean isSeatAvailable(){
-		return change.isFree() && other.isFree();
+		return seat.isAvailable();
 	}
 	public boolean isSeatPartiallyAvailable(){
-		return change.isChairChanged()?change.isFree():other.isFree();
+		return seat.isChairAvailable();
 	}
 	public boolean hasSeatAvailableChanged(){
-		return other.isFree();
+		return (change.isChairChanged() && seat.isDeskAvailable())||(change.isDeskChanged() && seat.isChairAvailable());
 	}
 	public boolean hasSeatPartiallyAvailableChanged(){
 		return change.isChairChanged();

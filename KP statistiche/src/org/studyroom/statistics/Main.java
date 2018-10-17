@@ -2,13 +2,13 @@ package org.studyroom.statistics;
 
 import java.awt.*;
 import java.awt.image.*;
-import java.io.*;
+//import java.io.*;
 import org.studyroom.statistics.kp.*;
 import org.studyroom.statistics.statistics.*;
 import org.studyroom.statistics.view.fx.*;
 import org.studyroom.statistics.view.web.*;
 import org.studyroom.statistics.viewmodel.*;
-import org.studyroom.web.*;
+//import org.studyroom.web.*;
 
 public class Main {
 	public static void main(String[] args){
@@ -18,13 +18,13 @@ public class Main {
 		kp.start();
 		WebApp.setViewModelClass(GraphicViewModel.class);
 		WebApp.init();
-		WebServer s=WebServer.getInstance();
+		/*WebServer s=WebServer.getInstance();
 		if (!s.wasStarted())
 			try {
 				s.start(0,false);	//default:true
 			} catch (IOException e){
 				e.printStackTrace();
-			}
+			}*/
 		if (SystemTray.isSupported()){
 			App.setViewModelClass(GraphicViewModel.class);
 			new Thread(()->App.launch(App.class)).start();

@@ -13,10 +13,10 @@ class KPPersistence extends Persistence {
 	public Collection<StudyRoom> getStudyRooms(){
 		return Arrays.asList(studyRooms);
 	}
-	void notifyChange(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
-		notifyObservers(seatID,tableID,studyRoomID,change,other);
+	void notifyChange(Seat seat, SeatStateChange change){
+		notifyObservers(seat,change);
 	}
-	void initState(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
-		initObservers(seatID,tableID,studyRoomID,change,other);
+	void initState(Seat seat, SeatStateChange change){
+		initObservers(seat,change);
 	}
 }

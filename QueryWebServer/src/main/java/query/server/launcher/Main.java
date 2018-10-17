@@ -1,13 +1,10 @@
 package query.server.launcher;
 
-import java.io.IOException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.studyroom.web.WebServer;
-
-import query.server.handlers.BaseHandler;
-import query.server.utils.SibConnectionFactory;
+import java.io.*;
+import org.apache.logging.log4j.*;
+import org.studyroom.web.*;
+import query.server.handlers.*;
+import query.server.utils.*;
 
 public class Main {
 
@@ -22,7 +19,7 @@ public class Main {
 
 		LOG.info("Query web server is about to start...");
 		// I don't know why but with the second argument set to true (AKA daemon mode on) it won't start
-		server.start(0, false);
+		//server.start(0, false);
 		LOG.info("Query web server is now listening on port 80.");
 	}
 

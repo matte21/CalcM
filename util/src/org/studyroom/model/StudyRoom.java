@@ -27,6 +27,8 @@ public class StudyRoom implements Serializable {
 	public StudyRoom(String ID, Table[] tables){
 		this.ID=ID;
 		this.tables=tables;
+		for (Table t : tables)
+			t.setStudyRoom(this);
 	}
 	public StudyRoom(String URI, int capacity){
 		this(URI,new Table[0]);

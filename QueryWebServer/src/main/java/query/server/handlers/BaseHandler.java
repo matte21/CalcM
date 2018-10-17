@@ -43,7 +43,7 @@ public class BaseHandler extends SIBFacingHandler {
 	// its execution environment, which might change in the future. It should be the opposite: the src code
 	// should make an assumption on how the files will be organized in its execution environment, and the
 	// build/deploy scripts should make those assumptions true. Currently the opposite is happening. 
-	private final String pathToHTMLTemplate = "queryWebServer/src/main/resources/indexTemplate.html";
+	private final String pathToHTMLTemplate = "../QueryWebServer/src/main/resources/indexTemplate.html";
 	private final String openRoomsDisplayerID = "open_rooms_table";
 	private final String closedRoomsDisplayerID = "closed_rooms_table";
 	

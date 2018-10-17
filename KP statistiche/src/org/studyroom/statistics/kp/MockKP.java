@@ -91,15 +91,12 @@ public class MockKP extends KPStatistics {
 				Table t=r.getTables()[f.apply(r.getTables().length)];
 				Seat s=t.getSeats()[f.apply(t.getSeats().length)];
 				boolean b=Math.random()<.5;
-				SeatStateChange o,c=b?(s.isChairAvailable()?CHAIR_OCCUPIED:CHAIR_FREE):(s.isDeskAvailable()?DESK_OCCUPIED:DESK_FREE);
-				if (c.isChairChanged()){
+				SeatStateChange c=b?(s.isChairAvailable()?CHAIR_OCCUPIED:CHAIR_FREE):(s.isDeskAvailable()?DESK_OCCUPIED:DESK_FREE);
+				if (c.isChairChanged())
 					s.setChairAvailable(c.isFree());
-					o=s.isDeskAvailable()?DESK_FREE:DESK_OCCUPIED;
-				} else {
+				else
 					s.setDeskAvailable(c.isFree());
-					o=s.isChairAvailable()?CHAIR_FREE:CHAIR_OCCUPIED;
-				}
-				getPersistence().notifyChange(s.getID(),t.getID(),r.getID(),c,o);
+				getPersistence().notifyChange(s,c);
 				System.out.println("Posti occupati: "+(sr[0].getCapacity()-sr[0].getAvailableSeats())+", "+(sr[1].getCapacity()-sr[1].getAvailableSeats()));
 			}
 		},1000,1000);
@@ -109,25 +106,25 @@ public class MockKP extends KPStatistics {
 		StudyRoom sr=this.sr[isr];
 		Table t=sr.getTables()[it];
 		Seat s=t.getSeats()[is];
-		SeatStateChange other=null;
+		//SeatStateChange other=null;
 		switch (state){
 		case CHAIR_FREE:
 			s.setChairAvailable(true);
-			other=desk(!s.isDeskAvailable());
+			//other=desk(!s.isDeskAvailable());
 			break;
 		case CHAIR_OCCUPIED:
 			s.setChairAvailable(false);
-			other=desk(!s.isDeskAvailable());
+			//other=desk(!s.isDeskAvailable());
 			break;
 		case DESK_FREE:
 			s.setDeskAvailable(true);
-			other=chair(!s.isChairAvailable());
+			//other=chair(!s.isChairAvailable());
 			break;
 		case DESK_OCCUPIED:
 			s.setDeskAvailable(false);
-			other=chair(!s.isChairAvailable());
+			//other=chair(!s.isChairAvailable());
 			break;
 		}
-		getPersistence().initState(s.getID(),t.getID(),sr.getID(),state,other);
+		getPersistence().initState(s,state);
 	}
 }

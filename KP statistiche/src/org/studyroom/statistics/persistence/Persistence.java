@@ -27,13 +27,13 @@ public abstract class Persistence extends Observable {
 	protected Persistence(){
 		setInstance(this);
 	}
-	protected void notifyObservers(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
+	protected void notifyObservers(Seat seat, SeatStateChange change){
 		setChanged();
-		notifyObservers(new SeatStateChangedEvent(seatID,tableID,studyRoomID,change,other));
+		notifyObservers(new SeatStateChangedEvent(seat,change));
 	}
-	protected void initObservers(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
+	protected void initObservers(Seat seat, SeatStateChange change){
 		setChanged();
-		notifyObservers(new SeatStateChangedEvent(seatID,tableID,studyRoomID,change,other,true));
+		notifyObservers(new SeatStateChangedEvent(seat,change,true));
 	}
 	public abstract Collection<StudyRoom> getStudyRooms();
 	public Collection<String> getStudyRoomsNames(){
