@@ -8,18 +8,18 @@ import org.studyroom.statistics.persistence.*;
 import sofia_kp.*;
 import static org.studyroom.kp.SIBUtils.*;
 
-public class RedSIBKP extends KPStatistics {
+public class SIBKP extends KPStatistics {
 	private static final String SIB_HOST="localhost";
 	private static final int SIB_PORT=10010;
-	private static RedSIBKP instance;
+	private static SIBKP instance;
 	private final KPICore sib;
-	private Map<String,Seat> seats;
-	public static RedSIBKP getInstance(){
+	//private Map<String,Seat> seats;
+	public static SIBKP getInstance(){
 		if (instance==null)
-			instance=new RedSIBKP();
+			instance=new SIBKP();
 		return instance;
 	}
-	private RedSIBKP(){
+	private SIBKP(){
 		sib=new KPICore(SIB_HOST,SIB_PORT,SMART_SPACE_NAME);
 		sib.setProtocol_version(1);
 		//sib.enable_debug_message();//XXX
@@ -42,7 +42,7 @@ public class RedSIBKP extends KPStatistics {
 				+ "?uid rdf:type sr:University;"
 				+ "		sr:hasUniversityID ?u}").stream().map(l->new StudyRoom(getID(l,0),getInt(l,3),getString(l,1),getString(l,2))).toArray(StudyRoom[]::new);*/
 		Map<String,Map<String,List<Seat>>> m=new LinkedHashMap<>();
-		seats=new HashMap<>();
+		Map<String,Seat> seats=new HashMap<>();
 		Map<String,String[]> srData=new HashMap<>();
 		for (List<String[]> r : query(sib,sparqlPrefix("sr","rdf")+"SELECT ?sr ?n ?u ?t ?s ?chairState ?deskState WHERE {"
 				+ "?sr rdf:type sr:StudyRoom;"
@@ -80,7 +80,7 @@ public class RedSIBKP extends KPStatistics {
 				+ "		sr:hasUniversityID ?u}").stream().map(l->new StudyRoom(getID(l,0),getInt(l,3),getString(l,1),getString(l,2))).toArray(StudyRoom[]::new);*/
 		return new KPPersistence(m.keySet().stream().map(sr->new StudyRoom(sr,m.get(sr).keySet().stream().map(
 				t->new Table(t,m.get(sr).get(t).toArray(new Seat[0]))
-			).toArray(Table[]::new),srData.get(sr)[0],srData.get(sr)[1])).toArray(StudyRoom[]::new));
+			).toArray(Table[]::new),srData.get(sr)[0],srData.get(sr)[1])).toArray(StudyRoom[]::new),seats);
 	}
 	@Override
 	public void start(){
@@ -103,7 +103,7 @@ public class RedSIBKP extends KPStatistics {
 				getPersistence().initState(seatID,tableID,studyRoomID,SeatStateChange.DESK_OCCUPIED,SeatStateChange.chair(chairOccupied));
 			System.out.println(seatID+" "+chairOccupied+" "+deskOccupied);
 		}*/
-		for (Seat s : seats.values()){
+		for (Seat s : getPersistence().getSeats()){
 			if (!s.isChairAvailable())
 				getPersistence().initState(s,SeatStateChange.CHAIR_OCCUPIED);
 			if (!s.isDeskAvailable())
@@ -120,21 +120,21 @@ public class RedSIBKP extends KPStatistics {
 	}
 	private void onChairSensorChange(List<String[]> result){
 		System.out.println("Chair changed");	//XXX
-		Seat s=seats.get(getID(result,0));
-		if (s==null)
-			throw new IllegalStateException("Unknown seat ID");
+		Seat s=getPersistence().getSeat(getID(result,0));
 		boolean occupied=isSomethingDetected(getString(result,1));
-		s.setChairAvailable(!occupied);
-		getPersistence().notifyChange(s,SeatStateChange.chair(occupied));
+		synchronized (s){
+			s.setChairAvailable(!occupied);
+			getPersistence().notifyChange(s,SeatStateChange.chair(occupied));
+		}
 	}
 	private void onDeskSensorChange(List<String[]> result){
 		System.out.println("Table changed");	//XXX
-		Seat s=seats.get(getID(result,0));
-		if (s==null)
-			throw new IllegalStateException("Unknown seat ID");
+		Seat s=getPersistence().getSeat(getID(result,0));
 		boolean occupied=isSomethingDetected(getString(result,1));
-		s.setDeskAvailable(!occupied);
-		getPersistence().notifyChange(s,SeatStateChange.desk(occupied));
+		synchronized (s){
+			s.setDeskAvailable(!occupied);
+			getPersistence().notifyChange(s,SeatStateChange.desk(occupied));
+		}
 	}
 	
 	/**@return whether the value is {@code sr:somethingDetected}*/
@@ -158,7 +158,7 @@ public class RedSIBKP extends KPStatistics {
 		public void kpic_RDFEventHandler(Vector<Vector<String>> newTriples, Vector<Vector<String>> oldTriples, String indSequence, String subID){}
 		@Override
 		public void kpic_UnsubscribeEventHandler(String sub_ID){
-			RedSIBKP.this.sib.leave();
+			SIBKP.this.sib.leave();
 		}
 		@Override
 		public void kpic_ExceptionEventHandler(Throwable e){

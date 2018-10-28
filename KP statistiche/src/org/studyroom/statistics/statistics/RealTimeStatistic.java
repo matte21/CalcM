@@ -14,7 +14,7 @@ public abstract class RealTimeStatistic extends Statistic implements Observer {
 	}
 	protected abstract void onSeatStateChanged(SeatStateChangedEvent e);
 	
-	protected static class Seat {
+	/*protected static class Seat {
 		public static final byte FREE=0, PARTIAL=1, FULL=2;
 		private byte state;
 		public boolean isFree(){
@@ -32,5 +32,5 @@ public abstract class RealTimeStatistic extends Statistic implements Observer {
 		void setState(byte state){
 			this.state=state;
 		}
-	}
+	}*/
 }

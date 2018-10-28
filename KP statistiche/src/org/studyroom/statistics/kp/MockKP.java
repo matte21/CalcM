@@ -2,6 +2,7 @@ package org.studyroom.statistics.kp;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 import org.studyroom.model.*;
 import org.studyroom.statistics.persistence.*;
 import static org.studyroom.statistics.persistence.SeatStateChange.*;
@@ -53,10 +54,7 @@ public class MockKP extends KPStatistics {
 	}
 	@Override
 	protected KPPersistence createPersistence(){
-		return new KPPersistence(new StudyRoom[]{
-				new StudyRoom("sr1",sr[0].getCapacity(),"Aula studio lab4","Alma Mater Studiorum"),
-				new StudyRoom("sr2",sr[1].getCapacity(),"Aula studio biblioteca","Alma Mater Studiorum")
-		});
+		return new KPPersistence(sr,Arrays.stream(sr).flatMap(s->Arrays.stream(s.getTables())).flatMap(t->Arrays.stream(t.getSeats())).collect(Collectors.toMap(Seat::getID,Function.identity())));
 	}
 	@Override
 	public void start(){

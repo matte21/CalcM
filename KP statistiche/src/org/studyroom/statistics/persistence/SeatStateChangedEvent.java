@@ -35,6 +35,12 @@ public class SeatStateChangedEvent {
 	public boolean isSeatPartiallyAvailable(){
 		return seat.isChairAvailable();
 	}
+	public boolean wasSeatAvailable(){
+		return (change.isChairChanged() && seat.isDeskAvailable() && !seat.isChairAvailable())||(change.isDeskChanged() && seat.isChairAvailable() && !seat.isDeskAvailable());
+	}
+	public boolean wasSeatPartiallyAvailable(){
+		return change.isChairChanged() ^ seat.isChairAvailable();
+	}
 	public boolean hasSeatAvailableChanged(){
 		return (change.isChairChanged() && seat.isDeskAvailable())||(change.isDeskChanged() && seat.isChairAvailable());
 	}

@@ -42,10 +42,19 @@ public abstract class Persistence extends Observable {
 	public Collection<String> getStudyRoomsIDs(){
 		return getStudyRooms().stream().map(StudyRoom::getID).collect(Collectors.toList());
 	}
-	public String getStudyRoomName(String ID){
-		return getStudyRooms().stream().filter(r->r.getID().equals(ID)).map(StudyRoom::getName).findFirst().orElseThrow(()->new IllegalArgumentException("ID "+ID+" not found"));
-	}
 	public StudyRoom getStudyRoom(String ID){
 		return getStudyRooms().stream().filter(r->r.getID().equals(ID)).findFirst().orElseThrow(()->new IllegalArgumentException("ID "+ID+" not found"));
+	}
+	public String getStudyRoomName(String ID){
+		return getStudyRoom(ID).getName();
+	}
+	public Collection<Seat> getSeats(){
+		return getStudyRooms().stream().flatMap(sr->Arrays.stream(sr.getTables())).flatMap(t->Arrays.stream(t.getSeats())).collect(Collectors.toList());
+	}
+	public Collection<Seat> getSeats(String studyRoomID){
+		return Arrays.stream(getStudyRoom(studyRoomID).getTables()).flatMap(t->Arrays.stream(t.getSeats())).collect(Collectors.toList());
+	}
+	public Seat getSeat(String studyRoomID, String seatID){
+		return getStudyRoom(studyRoomID).getSeat(seatID);
 	}
 }

@@ -123,7 +123,7 @@ public class SIBUtils {
 	 * @param query - the SPARQL query
 	 * @return the results list */
 	public static Vector<Vector<String[]>> query(KPICore sib, String query){
-		return new SSAP_sparql_response(sib.querySPARQL(query).Message).getResults();
+		return sib.querySPARQL(query).sparqlquery_results.getResults();
 	}
 	
 	/**Prints the SIB response to the standard output in case of success

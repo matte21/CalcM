@@ -26,8 +26,12 @@ public abstract class Statistic {
 				srt,
 				new DailyStat(),
 				new WeeklyStat(),
-				new OccupationTimeStat()
-				//new ...()	TODO
+				new OccupationTimeStat(),
+				new EfficiencyStatFull(),
+				new EfficiencyStatFree(),
+				new EfficiencyTimeStatFull(),
+				new EfficiencyTimeStatFree()
+				//new ...()
 		};
 		File d=new File(SAVE_PATH);
 		boolean load=d.exists();
@@ -41,8 +45,8 @@ public abstract class Statistic {
 						System.err.println(f.getAbsolutePath()+" danneggiato");
 					}
 			}
-			if (s instanceof PeriodicStatistic)
-				srt.addIntValueListener((PeriodicStatistic)s);
+			if (s instanceof IntValueChangedListener)
+				srt.addIntValueListener((IntValueChangedListener)s);
 			else if (s instanceof RealTimeStatistic)
 				Persistence.getInstance().addObserver((RealTimeStatistic)s);
 			statistics.put(s.getName(),s);
@@ -200,5 +204,8 @@ public abstract class Statistic {
 	}
 	protected static interface IntValueChangedListener {
 		void onValueChanged(String studyRoomID, IntValue newValue);
+	}
+	protected static enum SeatState {
+		FREE, PARTIAL, FULL;
 	}
 }
