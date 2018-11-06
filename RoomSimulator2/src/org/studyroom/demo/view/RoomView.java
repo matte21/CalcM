@@ -1,5 +1,7 @@
 package org.studyroom.demo.view;
 
+import java.util.function.*;
+import java.util.stream.*;
 import javafx.geometry.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -9,10 +11,10 @@ import org.studyroom.demo.viewmodel.*;
 import org.studyroom.view.*;
 
 public class RoomView extends BorderPane {
-	private IRoomViewModel viewModel;
-	private VBox room;
+	private final IRoomViewModel viewModel;
+	private final VBox room;
 	public RoomView(IRoomViewModel vm){
-		this.viewModel=vm;
+		viewModel=vm;
 		MenuItem aot=new MenuItem("Sempre in primo piano");
 		MenuItem not=new MenuItem("Sblocca");
 		aot.setOnAction(e->{
@@ -26,14 +28,19 @@ public class RoomView extends BorderPane {
 			aot.setDisable(false);
 		});
 		not.setDisable(true);
-		MenuBar mb=new MenuBar(
-				new Menu("Aula",null,vm.getUniversities().stream().map(u->new Menu(u,null,vm.getStudyRooms(u).stream().map(s->{
-					MenuItem m=new MenuItem(s);
-					m.setOnAction(e->this.viewModel.selectStudyRoom(s,u));
-					return m;
-				}).toArray(MenuItem[]::new))).toArray(Menu[]::new)),
-				new Menu("Opzioni",null,aot,not)
-		);
+		MenuItem create=new MenuItem("Nuova...");
+		create.setOnAction(e->vm.createRoom());
+		Function<String,MenuItem> createRoomMenu=u->new Menu(u,null,vm.getStudyRooms(u).stream().map(s->{
+			MenuItem m=new MenuItem(s);
+			m.setOnAction(e->this.viewModel.selectStudyRoom(s,u));
+			return m;
+		}).toArray(MenuItem[]::new));
+		Menu rooms=new Menu("Aula",null,vm.getUniversities().stream().map(createRoomMenu).toArray(Menu[]::new));
+		BindingUtil.addPropertyListener("studyRooms",vm,l->{
+			rooms.getItems().clear();
+			rooms.getItems().addAll(vm.getUniversities().stream().map(createRoomMenu).collect(Collectors.toList()));
+		});
+		MenuBar mb=new MenuBar(rooms,new Menu("Opzioni",null,aot,not,new SeparatorMenuItem(),create));
 		setTop(mb);
 		Label name=new Label();
 		BindingUtil.bindStringOneWay(name.textProperty(),"selectedRoomName",vm);
@@ -65,5 +72,10 @@ public class RoomView extends BorderPane {
 			}
 			return p;
 		}).toArray(GridPane[]::new));
+		try {
+			Window w=getScene().getWindow();
+			w.sizeToScene();
+			w.centerOnScreen();
+		} catch (NullPointerException e){}
 	}
 }
