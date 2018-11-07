@@ -9,7 +9,7 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	private final Map<String,SeatOccupation> seats=new HashMap<>();
 	private final Map<String,List<SeatOccupation>> val=new TreeMap<>();
 	public OccupationTimeStat(){
-		super(false,true);
+		super(false,true,false,true);
 		for (String id : Persistence.getInstance().getStudyRoomsIDs())
 			val.put(id,new LinkedList<>());
 	}
@@ -50,14 +50,14 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	}
 	private Value getValue(String srID){
 		List<SeatOccupation> l=val.get(srID);
-		return l.parallelStream().map(SeatOccupation::toValue).reduce((v1,v2)->new IntValue(v1.getFull()+v2.getFull(),v1.getPartial()+v2.getPartial())).map(v->new Value(v.getFull()/60.0f/l.size(),v.getPartial()/60.0f/l.size())).orElse(new Value(0,0));
+		return l.parallelStream().map(SeatOccupation::toValue).filter(v->v!=null).reduce((v1,v2)->new IntValue(v1.getFull()+v2.getFull(),v1.getPartial()+v2.getPartial())).map(v->new Value(v.getFull()/60.0f/l.size(),v.getPartial()/60.0f/l.size())).orElse(new Value(0,0));
 	}
 	@Override
 	protected void loadStatisticData(Map<String,Map<String,String>> data){
 		data.forEach((sr,m)->{
 			List<SeatOccupation> l=val.get(sr);
 			for (String s : m.values())
-				l.add(new SeatOccupation(new TreeMap<>(Arrays.stream(s.split(" ")).map(e->e.split(":")).collect(Collectors.toMap(e->Long.parseLong(e[0]),e->SeatState.values()[Byte.parseByte(e[1])])))));
+				l.add(new SeatOccupation(new TreeMap<>(Arrays.stream(s.split(" ")).map(e->e.split(":")).collect(Collectors.toMap(e->Long.parseLong(e[0]),e->SeatState.valueOf(e[1]))))));
 		});
 	}
 	@Override

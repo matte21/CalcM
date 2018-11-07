@@ -14,7 +14,8 @@ public class Histogram extends StackedBarChart<String,Number> {
 	private final ObjectProperty<ObservableList<String>> categories;
 	private final ObjectProperty<ObservableMap<String,List<Number>>> values;
 	private final StringProperty tiles;
-	private String valProp,catProp,tilesProp;
+	private final BooleanProperty legendVisible, percentValues;
+	private String valProp, catProp, tilesProp, lvProp, percProp;
 	//@SuppressWarnings("unused")
 	//private final ObservableList<String> categories;
 	//private final ObservableList<Data<String,Number>> values;
@@ -35,13 +36,25 @@ public class Histogram extends StackedBarChart<String,Number> {
 		categories.unbind();
 		values.unbind();
 		tiles.unbind();
+		legendVisible.unbind();
+		percentValues.unbind();
 		this.vm.set(vm);
-		BindingUtil.bindListOneWay(categories,catProp,vm);
-		BindingUtil.bindMapOneWay(values,valProp,vm);
-		BindingUtil.bindStringOneWay(tiles,tilesProp,vm);
+		if (catProp!=null)
+			BindingUtil.bindListOneWay(categories,catProp,vm);
+		if (valProp!=null)
+			BindingUtil.bindMapOneWay(values,valProp,vm);
+		if (tilesProp!=null)
+			BindingUtil.bindStringOneWay(tiles,tilesProp,vm);
+		if (lvProp!=null)
+			BindingUtil.bindBooleanOneWay(legendVisible,lvProp,vm);
+		if (percProp!=null)
+			BindingUtil.bindBooleanOneWay(percentValues,percProp,vm);
 	}
 	
 	public static Histogram create(Object viewModel, String valProp, String catProp, String tilesProp){
+		return create(viewModel,valProp,catProp,tilesProp,null,null);
+	}
+	public static Histogram create(Object viewModel, String valProp, String catProp, String tilesProp, String legendVisibleProp, String percentProp){
 		ObjectProperty<ObservableMap<String,List<Number>>> dp=new SimpleObjectProperty<>();
 		ObjectProperty<ObservableList<String>> cp=new SimpleObjectProperty<>();
 		StringProperty tp=new SimpleStringProperty();
@@ -59,7 +72,7 @@ public class Histogram extends StackedBarChart<String,Number> {
 			data.clear();
 			data.addAll(toSeries(dp.get(),viewModel));
 		});
-		return new Histogram(viewModel,valProp,catProp,tilesProp,dp,cp,tp,cat,data);
+		return new Histogram(viewModel,valProp,catProp,tilesProp,legendVisibleProp,percentProp,dp,cp,tp,cat,data);
 	}
 	@SuppressWarnings("unchecked")
 	private static ObservableList<Series<String,Number>> toSeries(Map<String,List<Number>> data, Object viewModel){
@@ -80,16 +93,23 @@ public class Histogram extends StackedBarChart<String,Number> {
 		}
 		return FXCollections.observableList(l);
 	}
-	private Histogram(Object viewModel, String valProp, String catProp, String tilesProp, ObjectProperty<ObservableMap<String,List<Number>>> valuesProperty, ObjectProperty<ObservableList<String>> categoriesProperty, StringProperty tilesProperty, ObservableList<String> cat, ObservableList<Series<String,Number>> data){
+	private Histogram(Object viewModel, String valProp, String catProp, String tilesProp, String legendVisibleProp, String percentProp, ObjectProperty<ObservableMap<String,List<Number>>> valuesProperty, ObjectProperty<ObservableList<String>> categoriesProperty, StringProperty tilesProperty, ObservableList<String> cat, ObservableList<Series<String,Number>> data){
 		super(new CategoryAxis(cat),new NumberAxis(),data);
 		this.valProp=valProp;
 		this.catProp=catProp;
 		this.tilesProp=tilesProp;
+		lvProp=legendVisibleProp;
+		percProp=percentProp;
 		values=valuesProperty;
 		categories=categoriesProperty;
 		tiles=tilesProperty;
+		legendVisible=new SimpleBooleanProperty();
+		percentValues=new SimpleBooleanProperty();
+		BindingUtil.bindBooleanOneWay(legendVisible,legendVisibleProp,viewModel);
+		BindingUtil.bindBooleanOneWay(percentValues,percentProp,viewModel);
 		vm.set(viewModel);
 		vm.addListener((s,o,n)->setViewModel(n));
+		legendVisibleProperty().bind(legendVisible);
 		NumberAxis y=(NumberAxis)getYAxis();
 		y.labelProperty().bind(tilesProperty);
 		y.setTickLabelFormatter(new StringConverter<Number>(){
@@ -99,14 +119,20 @@ public class Histogram extends StackedBarChart<String,Number> {
 			}
 			@Override
 			public Number fromString(String s){
-				return Integer.parseInt(s);
+				try {
+					return Integer.parseInt(s);
+				} catch (NumberFormatException e){
+					return Double.parseDouble(s);
+				}
 			}
 		});
 		//y.setTickUnit(1);	//doesn't work
 		y.setMinorTickVisible(false);
+		y.autoRangingProperty().bind(percentValues.not());
+		y.autoRangingProperty().addListener((p,o,n)->{if (!n) ((NumberAxis)getYAxis()).setUpperBound(100);});
 		setAnimated(false);
-		//setLegendVisible(false);
 	}
+	//TODO rebind in setters
 	public String getBoundValuesPropertyName(){
 		return valProp;
 	}

@@ -10,7 +10,7 @@ public class WeeklyStat extends PeriodicStatistic {
 	private final Map<String,IntValue> currentVal=new HashMap<>();
 	private final Map<String,Map<Integer,List<IntValue>>> val=new HashMap<>();
 	public WeeklyStat(){
-		super(false,false,Duration.ofDays(1));
+		super(false,false,true,true,Duration.ofDays(1));
 		for (String id : Persistence.getInstance().getStudyRoomsIDs()){
 			currentVal.put(id,new IntValue(0,0));
 			val.put(id,new TreeMap<>());

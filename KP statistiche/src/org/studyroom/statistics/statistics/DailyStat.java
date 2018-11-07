@@ -9,7 +9,7 @@ public class DailyStat extends PeriodicStatistic {
 	private final Map<String,IntValue> currentVal=new HashMap<>();
 	private final Map<String,Map<Integer,List<IntValue>>> val=new HashMap<>();
 	public DailyStat(){
-		super(false,false,Duration.ofHours(1));
+		super(false,false,true,true,Duration.ofHours(1));
 		for (String id : Persistence.getInstance().getStudyRoomsIDs()){
 			currentVal.put(id,new IntValue(0,0));
 			val.put(id,new TreeMap<>());

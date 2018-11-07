@@ -58,7 +58,6 @@ public class GraphicViewModel extends ViewModel implements IGraphicViewModel {
 		String title=statistic.getName()+" - "+(selectedSR.size()==1?selectedSR.get(0).getName():aggregator.getName())+" ("+selectedSR.get(0).getUniversity()+")";
 		firePropertyChange("graphicTitle",graphicTitle,title);
 		graphicTitle=title;
-		System.out.println(title);	////XXX//////////
 	}
 	@Override
 	public Map<String,List<Double>> getData(){
@@ -99,15 +98,26 @@ public class GraphicViewModel extends ViewModel implements IGraphicViewModel {
 	public List<String> getLegend(){
 		return legend;
 	}
+	@Override
+	public boolean isLegendVisible(){
+		return statistic.isOnSeats();
+	}
+	@Override
+	public boolean isPercentValues(){
+		return statistic.isPercent();
+	}
 
 	public String getStatistic(){
 		return statistic.getName();
 	}
 	private void setStatistic(Statistic st){
 		String /*n=null,*/ l=null;
+		Boolean lv=null, pv=null;
 		if (statistic!=null){
 			//n=getStatistic();
 			l=getTilesLabel();
+			lv=isLegendVisible();
+			pv=isPercentValues();
 			statistic.removeListeners(catListener,valListener);
 		}
 		statistic=st;
@@ -115,9 +125,13 @@ public class GraphicViewModel extends ViewModel implements IGraphicViewModel {
 		//firePropertyChange("statistic",n,getStatistic());
 		aggregator=getAggregator();
 		cacheValid=false;
-		firePropertyChange("categories",null,getCategories());
-		firePropertyChange("tilesLabel",l,getTilesLabel());
-		firePropertyChange("data",null,getData());
+		if (lv!=null){
+			firePropertyChange("legendVisible",lv,isLegendVisible());
+			firePropertyChange("percentValues",pv,isPercentValues());
+			firePropertyChange("categories",null,getCategories());
+			firePropertyChange("tilesLabel",l,getTilesLabel());
+			firePropertyChange("data",null,getData());
+		}
 		updateGraphicTitle();
 	}
 	

@@ -94,16 +94,24 @@ public abstract class Statistic {
 	
 	private final List<CategoryChangedListener> catListeners=new LinkedList<>();
 	private final List<StatisticValueChangedListener> valListeners=new LinkedList<>();
-	private final boolean additive, singleValue;
-	protected Statistic(boolean additive, boolean singleValue){
+	private final boolean additive, singleValue, percent, onSeats;
+	protected Statistic(boolean additive, boolean singleValue, boolean percent, boolean onSeats){
 		this.additive=additive;
 		this.singleValue=singleValue;
+		this.percent=percent;
+		this.onSeats=onSeats;
 	}
 	public boolean isAdditive(){
 		return additive;
 	}
 	public boolean isSingleValue(){
 		return singleValue;
+	}
+	public boolean isPercent(){
+		return percent;
+	}
+	public boolean isOnSeats(){
+		return onSeats;
 	}
 	public boolean accept(Aggregator a){
 		return !((a.isAdditive()&& !additive)||(a.isComparison()&& !singleValue));

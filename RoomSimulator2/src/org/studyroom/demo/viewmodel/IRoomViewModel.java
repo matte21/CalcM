@@ -1,13 +1,9 @@
 package org.studyroom.demo.viewmodel;
 
-import java.beans.*;
 import java.util.*;
+import org.studyroom.viewmodel.*;
 
-public interface IRoomViewModel {
-	//for generic view-model
-	void addPropertyChangeListener(PropertyChangeListener l);
-	void removePropertyChangeListener(PropertyChangeListener l);
-	
+public interface IRoomViewModel extends IViewModel {
 	//room (only these are properties)
 	String getSelectedRoomName();
 	String getView();	//!=room to show a dialog

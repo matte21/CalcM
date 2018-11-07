@@ -2,7 +2,7 @@ package org.studyroom.viewmodel;
 
 import java.beans.*;
 
-public class ViewModel {
+public class ViewModel implements IViewModel {
 	private final PropertyChangeSupport ps=new PropertyChangeSupport(this);
 	public void addPropertyChangeListener(PropertyChangeListener l){
         ps.addPropertyChangeListener(l);

@@ -12,8 +12,8 @@ import org.studyroom.web.*;
 
 public class Main {
 	public static void main(String[] args){
-		//KPStatistics kp=SIBKP.getInstance();
-		KPStatistics kp=MockKP.getInstance();
+		KPStatistics kp=SIBKP.getInstance();
+		//KPStatistics kp=MockKP.getInstance();
 		kp.initPersistence();
 		Statistic.loadStatistics();
 		kp.start();

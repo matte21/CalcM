@@ -1,13 +1,9 @@
 package org.studyroom.demo.viewmodel;
 
-import java.beans.*;
 import java.util.*;
+import org.studyroom.viewmodel.*;
 
-public interface ICreateViewModel {
-	//for generic view-model
-	void addPropertyChangeListener(PropertyChangeListener l);
-	void removePropertyChangeListener(PropertyChangeListener l);
-	
+public interface ICreateViewModel extends IViewModel {
 	//room (only these are properties)
 	String getId();
 	void setId(String id);

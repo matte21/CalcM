@@ -11,7 +11,7 @@ public class EfficiencyTimeStatFull extends RealTimeStatistic {
 	private final Map<String,SeatOccupation> seats=new HashMap<>();
 	private final Map<String,Value> val=new HashMap<>();
 	protected EfficiencyTimeStatFull(){
-		super(false,true);
+		super(false,true,true,false);
 		long now=System.currentTimeMillis();
 		for (Seat s : Persistence.getInstance().getSeats())
 			seats.put(s.getID(),new SeatOccupation(s.isAvailable()?FREE:s.isChairAvailable()?PARTIAL:FULL,now));

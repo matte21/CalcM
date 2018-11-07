@@ -4,8 +4,8 @@ import java.util.*;
 import org.studyroom.statistics.persistence.*;
 
 public abstract class RealTimeStatistic extends Statistic implements Observer {
-	protected RealTimeStatistic(boolean additive, boolean singleValue){
-		super(additive,singleValue);
+	protected RealTimeStatistic(boolean additive, boolean singleValue, boolean percent, boolean onSeats){
+		super(additive,singleValue,percent,onSeats);
 	}
 	@Override
 	public void update(Observable o, Object arg){

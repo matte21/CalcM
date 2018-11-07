@@ -7,7 +7,7 @@ import org.studyroom.statistics.persistence.*;
 public class EfficiencyStatFree extends RealTimeStatistic implements Statistic.IntValueChangedListener {
 	private final Map<String,IntValue> val=new HashMap<>();
 	protected EfficiencyStatFree(){
-		super(false,true);
+		super(false,true,true,false);
 		for (String uri : Persistence.getInstance().getStudyRoomsIDs())
 			val.put(uri,new IntValue(0,0));
 	}

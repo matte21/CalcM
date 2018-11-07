@@ -9,7 +9,7 @@ public class RealTimeOccupation extends RealTimeStatistic implements Observer {
 	private final Map<String,IntValue> val=new TreeMap<>();
 	private final List<IntValueChangedListener> valListeners=new LinkedList<>();
 	public RealTimeOccupation(){
-		super(false,true);
+		super(false,true,true,true);
 		for (String uri : Persistence.getInstance().getStudyRoomsIDs())
 			val.put(uri,new IntValue(0,0));
 	}
@@ -38,7 +38,6 @@ public class RealTimeOccupation extends RealTimeStatistic implements Observer {
 			p++;
 		v=new IntValue(f,p);
 		val.put(e.getStudyRoomID(),v);
-		System.out.println(Persistence.getInstance().getStudyRoomName(e.getStudyRoomID())+": "+f+" - "+p);	//XXX
 		notifyChange(Persistence.getInstance().getStudyRoom(e.getStudyRoomID()),v,e.isInitEvent());
 	}
 	@Override
