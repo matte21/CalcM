@@ -6,7 +6,7 @@ import org.studyroom.model.*;
 import org.studyroom.statistics.persistence.*;
 
 public class WeeklyStat extends PeriodicStatistic {
-	private static final String[] DAYS={"","lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"};
+	private static final String[] DAYS={"lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"};
 	private final Map<String,IntValue> currentVal=new HashMap<>();
 	private final Map<String,Map<Integer,List<IntValue>>> val=new HashMap<>();
 	public WeeklyStat(){
@@ -65,8 +65,8 @@ public class WeeklyStat extends PeriodicStatistic {
 		int d=(LocalDate.now().getDayOfWeek().getValue()+6)%7;
 		synchronized (currentVal){
 			for (Map.Entry<String,IntValue> e : currentVal.entrySet()){
-				/*if (e.getValue().getTotal()==0)
-					continue;*/
+				if (e.getValue().getTotal()==0 && !Persistence.getInstance().getStudyRoom(e.getKey()).isOpen())
+					continue;
 				Map<Integer,List<IntValue>> m=val.get(e.getKey());
 				synchronized (m){
 					m.putIfAbsent(d,new ArrayList<>());

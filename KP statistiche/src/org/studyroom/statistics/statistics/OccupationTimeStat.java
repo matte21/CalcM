@@ -54,11 +54,16 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	}
 	@Override
 	protected void loadStatisticData(Map<String,Map<String,String>> data){
+		System.out.println(data);
 		data.forEach((sr,m)->{
 			List<SeatOccupation> l=val.get(sr);
-			for (String s : m.values())
-				l.add(new SeatOccupation(new TreeMap<>(Arrays.stream(s.split(" ")).map(e->e.split(":")).collect(Collectors.toMap(e->Long.parseLong(e[0]),e->SeatState.valueOf(e[1]))))));
+			if (l!=null)
+				for (String s : m.values())
+					l.add(new SeatOccupation(new TreeMap<>(Arrays.stream(s.split(" ")).map(e->e.split(":")).collect(Collectors.toMap(e->Long.parseLong(e[0]),e->SeatState.valueOf(e[1]))))));
+			else
+				System.err.println(getName()+": unknown room \""+sr+"\" in data file");
 		});
+		System.out.println(val);
 	}
 	@Override
 	protected Map<String,Map<String,String>> saveStatisticData(){
@@ -75,12 +80,14 @@ public class OccupationTimeStat extends RealTimeStatistic {
 		private SortedMap<Long,SeatState> states=new TreeMap<>();
 		protected boolean closed;
 		public SeatOccupation(SeatState state){
-			if (state!=SeatState.PARTIAL && state!=FULL)
+			if (state==FREE)
 				throw new IllegalArgumentException("Illegal state");
+			closed=false;
 			setState(state);
 		}
 		SeatOccupation(SortedMap<Long,SeatState> m){
 			states=m;
+			closed=m.get(m.lastKey())==FREE;
 		}
 		public boolean isSetFree(){
 			return closed;

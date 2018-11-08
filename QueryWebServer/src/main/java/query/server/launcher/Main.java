@@ -18,8 +18,16 @@ public class Main {
 		server.addRoute("/", BaseHandler.class);
 
 		LOG.info("Query web server is about to start...");
-		// I don't know why but with the second argument set to true (AKA daemon mode on) it won't start
-		//server.start(0, false);
+		if (Thread.currentThread().getStackTrace().length==2){
+			WebServer s=WebServer.getInstance();
+			if (!s.wasStarted())
+				try {
+					System.out.println("Starting web server");
+					s.start(0,false);	//default:true
+				} catch (IOException e){
+					e.printStackTrace();
+				}
+		}
 		LOG.info("Query web server is now listening on port 80.");
 	}
 

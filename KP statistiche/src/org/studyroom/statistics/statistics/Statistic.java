@@ -9,7 +9,7 @@ import org.studyroom.statistics.persistence.*;
 import org.studyroom.util.*;
 
 public abstract class Statistic {
-	protected static final String SAVE_PATH="./statistics";
+	protected static final String SAVE_PATH="../KP statistiche/statistics";
 	private static final Map<String,Statistic> statistics=new LinkedHashMap<>();
 	private static final Timer timer=new Timer("StatisticTimer",true);
 	public static Statistic get(String name){

@@ -19,7 +19,7 @@ public class Main {
 		kp.start();
 		WebApp.setViewModelClass(GraphicViewModel.class);
 		WebApp.init();
-		if (Thread.currentThread().getStackTrace().length>1){
+		if (Thread.currentThread().getStackTrace().length==2){
 			WebServer s=WebServer.getInstance();
 			if (!s.wasStarted())
 				try {

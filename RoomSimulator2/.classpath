@@ -6,5 +6,6 @@
 	<classpathentry kind="src" path="/util"/>
 	<classpathentry kind="lib" path="/util/lib/sofia_kp.jar" sourcepath="C:/Users/Riccardo/Documents/Java/lib/SmartM3/src"/>
 	<classpathentry kind="src" path="/KP sensore"/>
+	<classpathentry kind="src" path="/RoomAggregatorAPI"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

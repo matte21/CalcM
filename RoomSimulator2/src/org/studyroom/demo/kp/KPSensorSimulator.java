@@ -1,16 +1,19 @@
 package org.studyroom.demo.kp;
 
-import static org.studyroom.kp.SIBUtils.*;
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 import org.studyroom.model.*;
 import org.studyroom.sensor.*;
+import rooms.aggregator.*;
+import rooms.aggregator.redsib09.*;
 import sofia_kp.*;
+import static org.studyroom.kp.SIBUtils.*;
 
 public class KPSensorSimulator {
 	private KPICore sib;
+	private final RoomsAggregator aggregator;
 	private final Map<String,StudyRoom> studyRooms=new HashMap<>();
 	private final List<KPSensor> kps=new LinkedList<>();	//to prevent KPSensors being garbaged
 	public KPSensorSimulator(){
@@ -29,6 +32,7 @@ public class KPSensorSimulator {
 			printSIBResponse(r);
 			System.exit(1);
 		}
+		aggregator=new RedSIB09RoomsAggregator(sib.HOST,sib.PORT,sib.SMART_SPACE_NAME,getNS("sr"));
 	}
 	public StudyRoom getStudyRoom(String id){
 		studyRooms.computeIfAbsent(id,this::loadStudyRoom);
@@ -84,6 +88,7 @@ public class KPSensorSimulator {
 			}
 			t.add(new Table(tID,s.toArray(new Seat[s.size()])));
 		}
+		aggregator.startAggregatingRoom(id);
 		return new StudyRoom(id,t.toArray(new Table[t.size()]),getString(srq,0),getString(srq,1));
 	}
 	public void addStudyRoom(StudyRoom sr){
@@ -127,6 +132,7 @@ public class KPSensorSimulator {
 		if (!sib.querySPARQL(query.toString()).isConfirmed())
 			System.err.println("Error in uploading room data on the SIB");
 		studyRooms.put(sr.getID(),sr);
+		aggregator.startAggregatingRoom(sr.getID());
 	}
 	public boolean existsID(String id){
 		if (studyRooms.containsKey(id))
