@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,16 +39,17 @@ public class RoomStateManagerLauncher {
 	private int sibPort;
  
 	private static final String ROOM_ID_VAR_NAME = "roomID";
+	// Any query that returns 1 result per room works
 	private static final String ALL_ROOMS_IDS_SPARQL_QUERY_TEMPLATE = "PREFIX ns:<ontology-prefix> \n"
 																	  + "SELECT ?" + ROOM_ID_VAR_NAME + " \n"
 																	  + "WHERE { \n"
-																	  + "?" + ROOM_ID_VAR_NAME + " ns:studyRoomState "
-																	  + "?openClosedState \n"
+																	  + "?" + ROOM_ID_VAR_NAME + " ns:inUniversity "
+																	  + "?univ \n"
 																	  + "}";
 	private String allRoomsIDsSparqlQuery;
 	
 	private static final DateTimeFormatter HOUR_AND_MINUTE_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-			
+	
 	public static void main(String[] args) throws SIBConnectionErrorException {
 		RoomStateManagerLauncher launcher = new RoomStateManagerLauncher(args);
 		launcher.startManagingAllRoomsInSIB();
@@ -75,6 +78,7 @@ public class RoomStateManagerLauncher {
 		List<String> roomIDs;
 		try {
 			roomIDs = getAllRoomsIDs();
+	//		injectFakeNextTransitionInstants(roomIDs, connToSIB);
 		} catch (SIBConnectionErrorException e) {
 			// Try to leave the smart space as a clean up action
 			SIBResponse resp = connToSIB.leave();
@@ -128,7 +132,7 @@ public class RoomStateManagerLauncher {
 		
 		return extractRoomIDsFromSIBResponse(queryResp);
 	}
-
+	
 	private List<String> extractRoomIDsFromSIBResponse(SIBResponse queryResp) {
 		short roomIDNameFieldIndex = 2;
 		Vector<String[]> roomIDs = queryResp.sparqlquery_results.getResultsForVar(ROOM_ID_VAR_NAME);

@@ -1,6 +1,6 @@
 # TODO: this file has been written incrementally as the artifacts that it copies to the docker container were developed.
 # Thus, it's quite chaotic. A better refactoring should be done (es. group all the COPY directives into a single one, since
-# all the resources that are copied are in the same directory).
+# all the resources that are copied are in the same directory, etc...).
 
 # Use Ubuntu 12.04 as the base image because it is the Ubuntu distro the SIB version used in this container was tested on
 FROM ubuntu:12.04
@@ -25,6 +25,11 @@ RUN apt-get update && \
     apt-get install -y oracle-java8-installer && \
     apt-get clean
 
+# This sets the timezone to the location where we will run the demo this docker file is for. This solution is hackish and brittle.
+# TODO: Find an alternative. For instance, find a way to make the Docker container automatically sync its timezone with that of the host.  
+ENV TZ=Europe/Rome
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Set working directory to calc-demo, where all the files needed will be installed
 WORKDIR /calcm-demo
 
@@ -46,7 +51,7 @@ RUN echo $installVirtuoso | ./install.sh
 WORKDIR /calcm-demo
 
 # In the demo we need the SIB to store the study room ontology and the dataset for the demo (study room instances, etc...). We can load all these items into
-# the SIB with the ConfigurableJenaBasedOntologyLoader. Thus, we put it into the container the corrosponding archive, extract it, make its launch script 
+# the SIB with the ConfigurableJenaBasedOntologyLoader. Thus, we put it into the container the corresponding archive, extract it, make its launch script 
 # executable and remove the archive as we no longer need it.
 COPY resources/ontologyLoader.tar.gz .
 RUN tar -xzf ontologyLoader.tar.gz && \
@@ -81,6 +86,13 @@ COPY resources/roomStateManager.tar .
 RUN tar -xf roomStateManager.tar && \
     chmod u+x roomStateManager/bin/RoomStateManager && \
     rm roomStateManager.tar
+
+# Copy the distribution (executable and all needed resources) of the RoomsAggregator (the component that 
+# updates the number fo available seats in the study rooms).
+COPY resources/roomsAggregator.tar .
+RUN tar -xf roomsAggregator.tar && \
+    chmod u+x roomsAggregator/bin/RoomAggregatorAPI && \
+    rm roomsAggregator.tar
 
 # Copy the distribution (executable and all needed resources) of the Query web server AKA the frontend clients will talk to
 COPY resources/queryWebServer.tar . 

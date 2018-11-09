@@ -15,7 +15,7 @@ import opening.hours.exceptions.NullDayOfWeekAndTimeException;
  */
 public class OpeningHoursImpl implements OpeningHours {
 
-	private static final Logger LOG = LogManager.getLogger();
+//	private static final Logger LOG = LogManager.getLogger();
 	
 	private final DayOfWeekAndTime openingHours[]; 
 	
@@ -52,23 +52,23 @@ public class OpeningHoursImpl implements OpeningHours {
 		
 		// TODO remove after tests
 		for (int i = 0; i < openingHours.length; i++) {
-			LOG.debug("Opening Hours array entry nbr " + i + ": " + openingHours[i]);			
+			//LOG.debug("Opening Hours array entry nbr " + i + ": " + openingHours[i]);			
 		}
 		int indexOfBeforeDayOfWeekAndTime = Arrays.binarySearch(openingHours, beforeDayOfWeekAndTime);
 		
 		// TODO remove this logging after tests
-		LOG.debug("Binary search result: " + indexOfBeforeDayOfWeekAndTime);
+		//LOG.debug("Binary search result: " + indexOfBeforeDayOfWeekAndTime);
 		if (indexOfBeforeDayOfWeekAndTime >= 0) {
-			LOG.debug("Computing OpenClose before transition at " + beforeDayOfWeekAndTime.dayOfWeek + " " 
-					   + beforeDayOfWeekAndTime.time + ", index of provided transition: " + indexOfBeforeDayOfWeekAndTime);
+			//LOG.debug("Computing OpenClose before transition at " + beforeDayOfWeekAndTime.dayOfWeek + " " 
+			//		   + beforeDayOfWeekAndTime.time + ", index of provided transition: " + indexOfBeforeDayOfWeekAndTime);
 			return indexOfBeforeDayOfWeekAndTime % 2 == 0 ? OpenClosed.CLOSED : OpenClosed.OPEN;			
 		}
 		
 		int indexOfNextOpenCloseTransition = 
 				Math.abs(Arrays.binarySearch(openingHours, beforeDayOfWeekAndTime) + 1) % openingHours.length;
-		LOG.debug("Computing OpenClose before " + beforeDayOfWeekAndTime.dayOfWeek + " " 
-				   + beforeDayOfWeekAndTime.time + ", index of transition after provided time: " 
-				   + indexOfNextOpenCloseTransition);
+		//LOG.debug("Computing OpenClose before " + beforeDayOfWeekAndTime.dayOfWeek + " " 
+				//   + beforeDayOfWeekAndTime.time + ", index of transition after provided time: " 
+				  // + indexOfNextOpenCloseTransition);
 		return indexOfNextOpenCloseTransition % 2 == 0 ? OpenClosed.CLOSED : OpenClosed.OPEN;		
 	}
 

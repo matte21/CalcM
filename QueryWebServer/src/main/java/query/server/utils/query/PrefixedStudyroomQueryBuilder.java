@@ -1,4 +1,4 @@
-package query.server.utils.query.builder;
+package query.server.utils.query;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,19 +13,21 @@ public class PrefixedStudyroomQueryBuilder {
 	
 	private List<String> varsToSelect;
 	private List<String> whereFilters;
-
+	private List<String> filterClauses;
+	
 	private StringBuilder builder;
 	
 	private static final String PREFIX = "PREFIX";
 	private static final String SELECT = "SELECT";
 	private static final String WHERE = "WHERE";
-	private final static char SPARQL_VAR_SYMBOL = '?';
+	private static final char SPARQL_VAR_SYMBOL = '?';
 	
 	public PrefixedStudyroomQueryBuilder(Map<String, String> prefixToFullURI, Map<String, String> varsVocabulary) {
 		prefixes = buildPrefixes(prefixToFullURI);
 		this.varsVocabulary = prependSPARQLVarSymbol(varsVocabulary);
 		varsToSelect = new ArrayList<String>();
 		whereFilters = new ArrayList<String>();
+		filterClauses = new ArrayList<String>();
 	}
 
 	private String buildPrefixes(Map<String, String> prefixToFullURI) {
@@ -70,6 +72,15 @@ public class PrefixedStudyroomQueryBuilder {
 		builder = new StringBuilder(WHERE).append("{\n");
 		for (String filter : whereFilters) {
 			builder.append("\t").append(filter).append(" \n");
+		}
+		if (filterClauses.size() > 0) {
+			builder.append("\tFILTER ( ");
+			for (String filterClause : filterClauses) {
+				builder.append(filterClause).append(" && ");
+			}
+			// Remove spurius "&&" at the end of the filter clause
+			builder.delete(builder.length() - 3, builder.length());	
+			builder.append(")\n").toString();
 		}
 		return builder.append("}\n").toString();
 	}
@@ -140,13 +151,38 @@ public class PrefixedStudyroomQueryBuilder {
 			   .append(varsVocabulary.get("nextTransitionPredicate"))
 			   .append(" ")
 			   .append(varsVocabulary.get("nextTransitionInstant"))
-			   .append(" . \n\t")
-			   .append("VALUES ")
+			   .append("\n\t")
+			   .append("FILTER ( ( ")
 			   .append(varsVocabulary.get("nextTransitionPredicate"))
-			   .append(" { sr:closesAt sr:opensAt }")
+			   .append(" = sr:closesAt ) || ( ")
+			   .append(varsVocabulary.get("nextTransitionPredicate"))
+			   .append(" = sr:opensAt ")
+			   .append(") )");
+		whereFilters.add(builder.toString());
+		
+		return this;
+	}
+
+	// TODO: Note: when using this class, this method should be used as the very last filter
+	public PrefixedStudyroomQueryBuilder selectNextTransitionInstantAndPredicate() {
+		varsToSelect.add(varsVocabulary.get("nextTransitionInstant"));
+		varsToSelect.add(varsVocabulary.get("nextTransitionPredicate"));
+		
+		builder = new StringBuilder(varsVocabulary.get("roomID"));
+		builder.append(" ")
+			   .append(varsVocabulary.get("nextTransitionPredicate"))
+			   .append(" ")
+			   .append(varsVocabulary.get("nextTransitionInstant"))
 			   .append(" .");
 		whereFilters.add(builder.toString());
 		
+		builder = new StringBuilder("( ( ");
+		builder.append(varsVocabulary.get("nextTransitionPredicate"))
+		   	   .append(" = sr:closesAt ) || ( ")
+		   	   .append(varsVocabulary.get("nextTransitionPredicate"))
+		   	   .append(" = sr:opensAt ) )");
+		filterClauses.add(builder.toString());
+		   
 		return this;
 	}
 	
@@ -188,8 +224,9 @@ public class PrefixedStudyroomQueryBuilder {
 	}
 
 	public PrefixedStudyroomQueryBuilder addWhereFilterOnRoomState(String roomState) {
-		if (roomState == null || !roomState.trim().equals("open") || !roomState.trim().equals("closed")) {
-			throw new IllegalArgumentException("roomState arg must be exactly either \"open\" or \"closed\"");
+		if (roomState == null || !(roomState.trim().equals("open") || roomState.trim().equals("closed"))) {
+			throw new IllegalArgumentException("roomState arg must be exactly either \"open\" or \"closed\". " 
+					+ roomState + " was received.");
 		}
 		
 		builder = new StringBuilder(varsVocabulary.get("roomID"));
@@ -203,7 +240,8 @@ public class PrefixedStudyroomQueryBuilder {
 	}
 	
 	// TODO Extend this to support an arbitrary number of Near Seats. Notice that the way data is stored into
-	// the SIB does not make this very easy. Ideally we would modify the ontology with a nbrOfAvailNearSeats
+	// the SIB does not make this easy. Ideally we would modify the ontology with a nbrOfAvailNearSeats 
+	// predicate with domain sr:Seat and range xsd:Int.
 	public PrefixedStudyroomQueryBuilder addWhereFilterOnTwoNearSeats() {
 		builder = new StringBuilder(varsVocabulary.get("roomID"));
 		builder.append(" ")
@@ -216,6 +254,23 @@ public class PrefixedStudyroomQueryBuilder {
 		
 		return this;
 	}
+	
+	public PrefixedStudyroomQueryBuilder addWhereFilterOnAvailSeats(int numAvailSeats) {
+		if (numAvailSeats < 1) {
+			throw new IllegalArgumentException("numAvailSeats arg must be bigger than 1");
+		}
+
+		builder = new StringBuilder("(");
+		builder.append(" ")
+			   .append(varsVocabulary.get("availSeats"))
+			   .append(" >= ")
+			   .append("\"" + numAvailSeats  + "\"")
+			   .append(" )");
+		filterClauses.add(builder.toString());
+		
+		return this;
+	}
+	
 }
 
 

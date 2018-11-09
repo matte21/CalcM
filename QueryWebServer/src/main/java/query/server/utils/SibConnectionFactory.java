@@ -7,7 +7,6 @@ import query.server.exceptions.SIBConnectionErrorException;
 import sofia_kp.KPICore;
 import sofia_kp.SIBResponse;
 
-
 public class SibConnectionFactory {
 
 	private static SibConnectionFactory instance = null; 

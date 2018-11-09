@@ -1,3 +1,11 @@
 .displayer {
     border-style: solid; 
 }
+
+#room-features {
+   border: 1px solid black;    
+}
+
+table, th, td {
+   border: 1px solid black;
+}

@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="description" content="All study rooms divided by state (open vs closed).">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="queryWebServer/src/main/resources/styles.css">
+  <script type="text/javascript" src="queryWebServer/src/main/resources/script.js"></script>
   <title>Study rooms</title>
 </head>
 
@@ -12,26 +13,60 @@
     <div id="query_results_container">
         <div class="displayer" id="open_rooms">
             <h3>Open study rooms</h3>
-            <table class="rooms_table" id="open_rooms_table">
-                <tr>
-                    <th>Room name</th>
-                    <th>Available Seats</th>
-                    <th>Address</th>
-                </tr>
+            <table class="rooms_table">
+                <thead>
+                	<tr>
+                    	<th>Room name</th>
+                    	<th>Available Seats</th>
+                    	<th>Capacity</th>
+                    	<th>Address</th>
+                    	<th>Closes at</th>
+                    	<th>University</th>
+                	</tr>
+                </thead>
+                <tbody  id="open_rooms_table">
+                </tbody>
             </table>
         </div>
         <div class="displayer" id="closed_rooms">
             <h3>Closed study rooms</h3>
             <table class="rooms_table" id="closed_rooms_table">
-                <tr>
-                    <th>Room name</th>
-                    <th>Address</th>
-                </tr>
+                <thead>
+                	<tr>
+                    	<th>Room name</th>
+                    	<th>Available Seats</th>
+                    	<th>Capacity</th>
+                    	<th>Address</th>
+                    	<th>Opens at</th>
+                    	<th>University</th>
+                	</tr>
+                </thead>
+                <tbody  id="closed_rooms_table">
+                </tbody>
             </table>
         </div>
     </div>
     <div id="form_container" id="filters_form">
-        
+        <h3>Add filters</h3>
+        <form id="filtersForm"> 
+        	<fieldset id="filtersFieldSet">
+        		<label for="roomState">only open rooms:</label>
+        		<input type="checkbox" id="roomState" name="roomState" value="open"> <br>
+        		<label for="availSeats">available seats:</label>
+        		<input type="number" id="availSeats" name="availSeats" min="1" step="1"><br>
+                
+                <div id="room-features">
+                    <p>Room features:</p>
+                    <input type="checkbox" name="feat" value="isAccessible">accessible<br>
+                    <input type="checkbox" name="feat" value="airConditioning">air conditioning<br>
+        		    <input type="checkbox" name="feat" value="wifi">Wi-Fi<br>
+                    <input type="checkbox" name="feat" value="heating">heating<br>
+                    <input type="checkbox" name="feat" value="accessibleToilet">accessible toilet<br>
+                </div>
+
+                <button type="button" id="searchButton" >Search</button>
+        	</fieldset>
+        </form>
     </div>
 </body>
 </html>

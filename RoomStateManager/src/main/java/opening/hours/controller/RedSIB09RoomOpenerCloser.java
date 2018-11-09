@@ -42,8 +42,6 @@ import sofia_kp.KPICore;
 import sofia_kp.SIBResponse;
 
 public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
-
-	
 	// static fields used to turn ZonedDateTime instances into strings compliant with the xsd:dateTimestamp format
 	private static final String XSD_DATE_TIMESTAMP_PATTERN = "uuuu-MM-dd'T'HH:mm:ssxxx";  
 	private static final DateTimeFormatter XSD_DATE_TIMESTAMP_FORMATTER = 
@@ -63,7 +61,7 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 	private Map<String, UUID> roomIDtoSubscriptionID;
 	
 	/**
-	 * Connection to the SIB used by instances of this class when adding a study room among the managed ones. Used to 
+	 * Connection to the SIB used when adding a study room among the managed ones. Used to 
 	 * check whether the said room is stored in the SIB
 	 */
 	private KPICore sibConnToTestRoomExistence;
@@ -78,17 +76,19 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 	 * the SPARQL update.
 	 */
 	private String roomStateUpdateQueryTemplate;
+	// TODO uncomment or remove depending on test results
+	private String firstRoomStateUpdateQueryTemplate;
 	
 	private static final Logger LOG = LogManager.getLogger();
 	private static final Marker SPARQL = MarkerManager.getMarker("SPARQL");
 		
+	
 	public RedSIB09RoomOpenerCloser(String sibIPorHost, int sibPort, String smartSpaceName, String ontologyPrefix) 
 			throws SIBConnectionErrorException {
 		
 		LOG.info("Initializing...");
 		
 		validateInputs(sibIPorHost, sibPort, smartSpaceName, ontologyPrefix);
-		
 		this.sibIPorHost = sibIPorHost;
 		this.sibPort = sibPort;
 		this.smartSpaceName = smartSpaceName;
@@ -116,6 +116,13 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 										+ "ns:<room-ID> ns:studyRoomState ?oldState . \n"
 										+ "ns:<room-ID> ns:<old-transition-predicate> ?oldDateTimestamp . \n"
 										+ "}";
+		
+// TODO uncomment or remove depending on test results
+		firstRoomStateUpdateQueryTemplate = "PREFIX ns:<" + ontologyPrefix + "> \n"
+										+ "INSERT { \n"
+										+ "ns:<room-ID> ns:studyRoomState ns:<new-state> . \n"
+										+ "ns:<room-ID> ns:<new-transition-predicate> <xsd-new-date-timestamp> . \n"
+										+ "}";		
 				
 		sibConnToTestRoomExistence = getConnectionToSIB(sibIPorHost, sibPort, smartSpaceName);
 		LOG.debug("Successfully created SIB connection to test existence of rooms");
@@ -131,7 +138,7 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 		
 		/**
 		 * For the current version of this class, there MUST be ONLY ONE thread performing the updates, because even if
-		 * each room has a separate RoomUpdateTask instance, they share state. For instance, the connection to the 
+		 * each room has a separate RoomUpdateTask instance, they share state: the connection to the 
 		 * SIB used to perform the state updates is shared and is not thread-safe. Sharing it across multiple threads 
 		 * will cause problems. That is why a single thread scheduled executor is used.
 		 */
@@ -190,7 +197,6 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 		
 		return "";
 	}
-
 	
 	@Override
 	public void startManagingRoom(String roomID, OpeningHours oh) 
@@ -228,10 +234,9 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 			startManagingRoomNow(roomID, oh);
 		}
 		
-		LOG.info("The room with ID " + roomID + " is now being successfully manged");
+		LOG.info("The room with ID " + roomID + " is now being successfully managed");
 	}
 
-	
 	private void validateInputsForStartManagingRoom(String roomID, OpeningHours oh) {
 		if (roomID == null || roomID.trim().isEmpty()) {
 			throw new BadRoomIDException(roomID == null ? "received null for input parameter roomID" 
@@ -242,7 +247,6 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 			throw new BadOpeningHoursException("Received null for parameter \"oh\" of type OpeningHours.");
 		}
 	}
-
 	
 	private boolean roomExists(String roomID) throws SIBConnectionErrorException {
 		// This query returns results if and only if the SIB stores a room with ID roomID
@@ -273,7 +277,14 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 		}
 	}
 
-	
+	// FIXME this has not been tested and is probably buggy. Should not be used
+	/*
+	 * 
+	 * this has not been tested and is probably buggy. Should not be used
+	 * 
+	 * @param roomID
+	 * @param oh
+	 */
 	private void startManagingRoomAtStartDate(String roomID, OpeningHoursWithStartDate oh) {
 		/**
 		 * Compute the number of seconds between now and the instant at which we must begin monitoring the room with
@@ -329,13 +340,11 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 		
 		LOG.info("Successfully stopped managing room with ID " + roomID + ".");
 	}
-
 	
 	@Override
 	public boolean isManagingRoom(String roomID) {
 		return roomIDtoSubscriptionID.containsKey(roomID);
 	}
-	
 	
 	private void submitNewTaskAt(RoomUpdateTask roomUpdateTask, ZonedDateTime startOfExecution, String roomID) {
 		/**
@@ -352,7 +361,25 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 		LOG.debug("Room with ID " + roomID + ". Next update task scheduled to run in " + submissionDelaySeconds 
 				  + " seconds");
 	}
-	
+
+// TODO remove or uncomment depending on test results
+	private void sendFirstSPARQLUpdate(String roomID, OpenClosed newState,
+			ZonedDateTime nextTransitionZonedDateTime) throws SIBConnectionErrorException {
+
+		String nextTransitionDateTimestamp = XSD_DATE_TIMESTAMP_FORMATTER.format(nextTransitionZonedDateTime);
+		nextTransitionDateTimestamp = "\"" + nextTransitionDateTimestamp + "\"";
+		String sparqlUpdate = buildFirstSparqlUpdate(roomID, 
+				newState.toString().toLowerCase(), 
+				nextTransitionDateTimestamp);
+		
+		SIBResponse resp = sibConnToUpdateRoomState.update_sparql(sparqlUpdate);
+		if (resp == null || !resp.isConfirmed()) {
+			throw new SIBConnectionErrorException("Failed to send SPARQL update to SIB while attempting to update "
+					+ "the state of room with ID " + roomID + " to " + newState + ". SPARQL Update:\n" + sparqlUpdate);
+		}
+		LOG.debug(SPARQL, "Successfully sent the following SPARQL update to the SIB:\n" + sparqlUpdate);
+	}
+
 	private void sendSPARQLUpdate(String roomID, OpenClosed newState, ZonedDateTime nextTransitionZonedDateTime)
 			throws SIBConnectionErrorException {
 		
@@ -378,8 +405,17 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 										   .replace("<new-transition-predicate>", newTransitionPredicate)
 										   .replace("<xsd-new-date-timestamp>", newDateTimestamp);
 	}
-	
 
+// TODO remove or uncomment depending on tests results
+	private String buildFirstSparqlUpdate(String roomID, String newState, String newDateTimestamp) {
+		String newTransitionPredicate = newState.equals("open") ? "closesAt" : "opensAt";
+		
+		return firstRoomStateUpdateQueryTemplate.replace("<room-ID>", roomID)
+										   		.replace("<new-state>", newState)
+										   		.replace("<new-transition-predicate>", newTransitionPredicate)
+										   		.replace("<xsd-new-date-timestamp>", newDateTimestamp);
+	}
+	
 	/**
 	 * This method is meant to be used for testing purposes only, you should never use that elsewhere.
 	 * @throws InterruptedException 
@@ -411,11 +447,16 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 		private OpeningHours oh;
 		
 		private UUID subID;
+
+		// TODO remove or uncomment depending on tests results
+		private boolean thisIsFirstUpdate;
 		
 		protected RoomUpdateTask(String roomID, OpeningHours oh, UUID subID) {
 			this.roomID = roomID;
 			this.oh = oh;
 			this.subID = subID;
+			// TODO remove or uncomment depending on tests results
+			thisIsFirstUpdate = true;
 		}
 
 		
@@ -461,10 +502,10 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 			}
 			
 			/**
-			 * Schedule the update one second later than the computed next transition time. This way, the case where
+			 * Schedule the update two seconds later than the computed next transition time. This way, the case where
 			 * this task is executed before the actual transition time by a few milliseconds will never occur. This 
 			 * unfortunate case is rare but might happen (there are no guarantees at the millisecond precision on when 
-			 * the scheduled tasks will be executed. Without the robustness margin, in the aforementioned case, this 
+			 * the scheduled tasks will be executed). Without the robustness margin, in the aforementioned case, this 
 			 * update task would resubmit itself continuously before the actual transition time is reached. This does 
 			 * not lead to an inconsistent state in the SIB, but is less efficient.  
 			 */
@@ -500,11 +541,19 @@ public class RedSIB09RoomOpenerCloser implements RoomOpenerCloser {
 				throws FailedToUpdateRoomStateException {
 			
 			try {
-				sendSPARQLUpdate(roomID, newState, nextTransitionZonedDateTime);
+// TODO uncomment or remove depending on test results
+				if (thisIsFirstUpdate) {
+					sendFirstSPARQLUpdate(roomID, newState, nextTransitionZonedDateTime);					
+					thisIsFirstUpdate = false;
+				} else {
+					sendSPARQLUpdate(roomID, newState, nextTransitionZonedDateTime);
+				}
+				// TODO remove when code in above comment is removed
+				//sendSPARQLUpdate(roomID, newState, nextTransitionZonedDateTime);
 			} catch (SIBConnectionErrorException e) {
 				throw new FailedToUpdateRoomStateException(e.getMessage(), e);
 			}
 		}
-	
+
 	}
 }

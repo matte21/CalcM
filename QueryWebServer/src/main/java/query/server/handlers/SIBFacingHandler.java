@@ -6,7 +6,7 @@ import org.studyroom.web.Session;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import query.server.exceptions.SIBConnectionErrorException;
 import query.server.utils.SibConnectionFactory;
-import query.server.utils.query.builder.PrefixedQueryUtilsFactory;
+import query.server.utils.query.PrefixedQueryUtilsFactory;
 
 public abstract class SIBFacingHandler extends HTMLPage {
 	

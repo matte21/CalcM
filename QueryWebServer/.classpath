@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry path="bin" kind="output"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
+	<classpathentry sourcepath="/home/matteo/.gradle/caches/modules-2/files-2.1/org.jdom/jdom2/2.0.5/769f3cca4ce92088288be3d0238ef96ef787e82f/jdom2-2.0.5-sources.jar" kind="lib" path="/home/matteo/.gradle/caches/modules-2/files-2.1/org.jdom/jdom2/2.0.5/2001db51c131e555bafdb77fc52af6a9408c505e/jdom2-2.0.5.jar"/>
+	<classpathentry kind="lib" path="/home/matteo/Desktop/CalcMProject/GitRepo/QueryWebServer/libs/sofia_kp.jar"/>
+	<classpathentry kind="lib" path="/home/matteo/Desktop/CalcMProject/GitRepo/QueryWebServer/libs/nanohttpd-2.3.1.jar"/>
+	<classpathentry kind="lib" path="/home/matteo/Desktop/CalcMProject/GitRepo/QueryWebServer/libs/nanohttpd-nanolets-2.3.1.jar"/>
+	<classpathentry kind="lib" path="/home/matteo/Desktop/CalcMProject/GitRepo/QueryWebServer/libs/nanohttpd-websocket-2.3.1.jar"/>
+	<classpathentry sourcepath="/home/matteo/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-api/2.11.0/97f6fb29d69b48fe4bdb47cc21c834b4536cf752/log4j-api-2.11.0-sources.jar" kind="lib" path="/home/matteo/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-api/2.11.0/bede79a3f150711634a3047985517431bf6499f2/log4j-api-2.11.0.jar"/>
+	<classpathentry sourcepath="/home/matteo/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-core/2.11.0/932392dc515dae4e750ac4a96c39ba69d5e81db3/log4j-core-2.11.0-sources.jar" kind="lib" path="/home/matteo/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-core/2.11.0/e6b751e02120c08702d98750f6a80bc25343b7f5/log4j-core-2.11.0.jar"/>
+	<classpathentry sourcepath="/home/matteo/.gradle/caches/modules-2/files-2.1/org.jsoup/jsoup/1.11.3/871302b15d8cee9bfb393c4f1d0386b17646d8d1/jsoup-1.11.3-sources.jar" kind="lib" path="/home/matteo/.gradle/caches/modules-2/files-2.1/org.jsoup/jsoup/1.11.3/36da09a8f68484523fa2aaa100399d612b247d67/jsoup-1.11.3.jar"/>
+	<classpathentry sourcepath="/home/matteo/.gradle/caches/modules-2/files-2.1/org.json/json/20180813/60753006d96d5fc85b61b0897f3326b5c4e1c4f0/json-20180813-sources.jar" kind="lib" path="/home/matteo/.gradle/caches/modules-2/files-2.1/org.json/json/20180813/8566b2b0391d9d4479ea225645c6ed47ef17fe41/json-20180813.jar"/>
+	<classpathentry kind="lib" path="/home/matteo/Desktop/CalcMProject/GitRepo/QueryWebServer/libs/WebServer.jar"/>
+</classpath>

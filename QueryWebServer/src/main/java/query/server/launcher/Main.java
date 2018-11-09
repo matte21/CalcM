@@ -8,9 +8,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.studyroom.web.WebServer;
 
-import query.server.handlers.BaseHandler;
+import fi.iki.elonen.router.RouterNanoHTTPD.StaticPageHandler;
+import query.server.handlers.FiltersHandler;
+import query.server.handlers.IndexHandler;
+import query.server.handlers.WsFiltersHandler;
 import query.server.utils.SibConnectionFactory;
-import query.server.utils.query.builder.PrefixedQueryUtilsFactory;
+import query.server.utils.query.PrefixedQueryUtilsFactory;
 
 public class Main {
 
@@ -20,7 +23,7 @@ public class Main {
 	private static final Map<String, String> VARS_VOCABULARY = initVarsVocabulary();
 	
 	// FIXME These prefixes should be loaded from a config file. We were in a hurry so we hardcoded them 
-	// in this method
+	// in this method.
 	private static Map<String, String> initPrefixes() {
 		Map<String, String> prefixesToFullURIs = new HashMap<String, String>();
 		prefixesToFullURIs.put("sr", "http://www.semanticweb.org/matteo/ontologies/2016/11/OperazioneStudyRoom#");
@@ -55,16 +58,19 @@ public class Main {
 		
 		LOG.debug("Initializing queries utils factory..."); 
 		initQueryUtilsFactory(PREFIXES_TO_FULL_URIs, VARS_VOCABULARY);
-		LOG.debug("Queries utils successfully initialized.");
+		LOG.debug("Queries utils factory successfully initialized.");
 		
 		WebServer server = WebServer.getInstance();		
 
 		LOG.debug("Adding routes to web server...");		
-		server.addRoute("/", BaseHandler.class);
+		server.addRoute("/", IndexHandler.class);
+		server.addRoute("/filters", FiltersHandler.class);
+		server.addRoute("queryWebServer/src/main/resources/script.js", StaticPageHandler.class);
+		server.addRoute("queryWebServer/src/main/resources/styles.css", StaticPageHandler.class);		
+		server.addWebSocketMapping("filters", WsFiltersHandler.class);
 		LOG.debug("Routes successfully added to web server.");	
 
 		LOG.info("Query web server is about to start...");
-		// I don't know why but with the second argument set to true (AKA daemon mode on) it won't start
 		server.start(0, false);
 		LOG.info("Query web server is now listening on port 80.");
 	}

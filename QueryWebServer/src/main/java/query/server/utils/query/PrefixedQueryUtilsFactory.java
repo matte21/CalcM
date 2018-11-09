@@ -1,7 +1,9 @@
-package query.server.utils.query.builder;
+package query.server.utils.query;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import sofia_kp.SSAP_sparql_response;
 
 public class PrefixedQueryUtilsFactory {
 
@@ -9,12 +11,10 @@ public class PrefixedQueryUtilsFactory {
 	
 	private static Map<String, String> prefixesToFullURIs;
 	private static Map<String, String> varsVocabulary;
-	
-
-	
-	public PrefixedQueryUtilsFactory(Map<String, String> prefixToFullURI, Map<String, String> varsVocabulary) {
-		this.prefixesToFullURIs = new HashMap<String, String>(prefixToFullURI);
-		this.varsVocabulary = new HashMap<String, String>(varsVocabulary);
+		
+	private PrefixedQueryUtilsFactory(Map<String, String> prefixToFullURI, Map<String, String> varsVocabulary) {
+		PrefixedQueryUtilsFactory.prefixesToFullURIs = new HashMap<String, String>(prefixToFullURI);
+		PrefixedQueryUtilsFactory.varsVocabulary = new HashMap<String, String>(varsVocabulary);
 	}
 
 	public static void init(Map<String, String> prefixToFullURI, Map<String, String> varsVocabulary) {
@@ -27,10 +27,15 @@ public class PrefixedQueryUtilsFactory {
 		return instance;
 	}
 	
-	// TODO change return type with an interface
+	// TODO change return type with an interface, not the actual implementing class
 	public PrefixedStudyroomQueryBuilder getPrefixedQueryBuilder() {
 		return new PrefixedStudyroomQueryBuilder(prefixesToFullURIs, varsVocabulary);
 	}
 	
-	// TODO method that returns a query parser
+	public StudyroomQueryResultsParser newPrefixedQueryResultsExtractor(SSAP_sparql_response results) {
+		return new StudyroomQueryResultsParser(results, 
+				prefixesToFullURIs,
+				varsVocabulary);
+	}
+	
 }
