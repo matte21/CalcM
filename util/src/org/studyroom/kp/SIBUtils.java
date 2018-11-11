@@ -116,14 +116,24 @@ public class SIBUtils {
 		}
 	}
 	
-	/**Shortcut method to get the result list from a SPARQL query.
+	/**Shortcut method to get the result list from a SPARQL SELECT query.
 	 * To access each value of a result, use the {@link SSAP_sparql_response.getCellValue()} function
 	 * or the {@code getID()}, {@code getInt()} and {@code getString()} functions.
 	 * @param sib - the SIB to which send the query
 	 * @param query - the SPARQL query
 	 * @return the results list */
 	public static Vector<Vector<String[]>> query(KPICore sib, String query){
-		return new SSAP_sparql_response(sib.querySPARQL(query).Message).getResults();
+		return sib.querySPARQL(query).sparqlquery_results.getResults();
+	}
+	
+	/**Shortcut method to get the result from a SPARQL ASK query.
+	 * @param sib - the SIB to which send the query
+	 * @param query - the SPARQL query
+	 * @return the query answere */
+	public static boolean askQuery(KPICore sib, String query){
+		//return sib.querySPARQL(query).sparqlquery_results.getBooleans().get(0).equalsIgnoreCase("true");
+		SIBResponse r=sib.querySPARQL(query);
+		return r.sparqlquery_results.getBooleans().get(0).equalsIgnoreCase("true");
 	}
 	
 	/**Prints the SIB response to the standard output in case of success
@@ -166,7 +176,6 @@ public class SIBUtils {
 	
 	/**@return the ID of the URI at position {@code pos} of a query result */
 	public static String getID(List<String[]> result, int pos){
-		//System.out.println(Arrays.toString(result.get(pos)));//XXX
 		return removeNS(SSAP_sparql_response.getCellValue(result.get(pos)));
 	}
 	

@@ -5,11 +5,11 @@ import org.studyroom.model.*;
 import org.studyroom.statistics.persistence.*;
 
 public class RealTimeOccupation extends RealTimeStatistic implements Observer {
-	private final Map<String,Seat> seat=new HashMap<>();
+	//private final Map<String,Seat> seat=new HashMap<>();
 	private final Map<String,IntValue> val=new TreeMap<>();
 	private final List<IntValueChangedListener> valListeners=new LinkedList<>();
 	public RealTimeOccupation(){
-		super(false,true);
+		super(false,true,true,true);
 		for (String uri : Persistence.getInstance().getStudyRoomsIDs())
 			val.put(uri,new IntValue(0,0));
 	}
@@ -25,21 +25,20 @@ public class RealTimeOccupation extends RealTimeStatistic implements Observer {
 	public void onSeatStateChanged(SeatStateChangedEvent e){
 		IntValue v=val.get(e.getStudyRoomID());
 		int f=v.getFull(), p=v.getPartial();
-		seat.putIfAbsent(e.getSeatID(),new Seat());
-		Seat s=seat.get(e.getSeatID());
-		if (s.isFullyOccupied())
+		//seat.putIfAbsent(e.getSeatID(),new Seat());
+		//Seat s=Persistence.getInstance().getStudyRoom(e.getStudyRoomID()).getSeat(e.getSeatID());//seat.get(e.getSeatID());
+		if (!e.wasSeatPartiallyAvailable())
 			f--;
-		else if (s.isPartiallyOccupied())
+		else if (!e.wasSeatAvailable() && !e.isInitEvent())
 			p--;
-		s.setState(e.isSeatAvailable()?Seat.FREE:e.isSeatPartiallyAvailable()?Seat.PARTIAL:Seat.FULL);
-		if (s.isFullyOccupied())
+		//s.setState(e.isSeatAvailable()?Seat.FREE:e.isSeatPartiallyAvailable()?Seat.PARTIAL:Seat.FULL);
+		if (!e.isSeatPartiallyAvailable())
 			f++;
-		else if (s.isPartiallyOccupied())
+		else if (!e.isSeatAvailable())
 			p++;
 		v=new IntValue(f,p);
 		val.put(e.getStudyRoomID(),v);
-		StudyRoom sr=Persistence.getInstance().getStudyRoom(e.getStudyRoomID());
-		notifyChange(sr,v,e.isInitEvent());
+		notifyChange(Persistence.getInstance().getStudyRoom(e.getStudyRoomID()),v,e.isInitEvent());
 	}
 	@Override
 	public Map<String,Value> getValues(String srID){

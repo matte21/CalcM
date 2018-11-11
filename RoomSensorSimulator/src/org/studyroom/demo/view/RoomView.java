@@ -43,7 +43,6 @@ public class RoomView extends BorderPane {
 		room=new VBox(10);
 		room.setPadding(new Insets(20));
 		room.setAlignment(Pos.CENTER);
-		updateRoom();
 		BindingUtil.addPropertyListener("tables",vm,v->updateRoom());
 		
 		VBox p=new VBox(name,room);

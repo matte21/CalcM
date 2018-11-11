@@ -12,19 +12,23 @@ import org.studyroom.web.*;
 
 public class Main {
 	public static void main(String[] args){
-		KPStatistics kp=RedSIBKP.getInstance();
+		KPStatistics kp=SIBKP.getInstance();
+		//KPStatistics kp=MockKP.getInstance();
 		kp.initPersistence();
 		Statistic.loadStatistics();
 		kp.start();
 		WebApp.setViewModelClass(GraphicViewModel.class);
 		WebApp.init();
-		WebServer s=WebServer.getInstance();
-		if (!s.wasStarted())
-			try {
-				s.start(0,false);	//default:true
-			} catch (IOException e){
-				e.printStackTrace();
-			}
+		if (Thread.currentThread().getStackTrace().length==2){
+			WebServer s=WebServer.getInstance();
+			if (!s.wasStarted())
+				try {
+					System.out.println("Starting web server");
+					s.start(0,false);	//default:true
+				} catch (IOException e){
+					e.printStackTrace();
+				}
+		}
 		if (SystemTray.isSupported()){
 			App.setViewModelClass(GraphicViewModel.class);
 			new Thread(()->App.launch(App.class)).start();

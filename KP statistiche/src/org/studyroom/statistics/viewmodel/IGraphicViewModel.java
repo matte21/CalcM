@@ -1,19 +1,17 @@
 package org.studyroom.statistics.viewmodel;
 
-import java.beans.*;
 import java.util.*;
+import org.studyroom.viewmodel.*;
 
-public interface IGraphicViewModel {
-	//for generic view-model
-	void addPropertyChangeListener(PropertyChangeListener l);
-	void removePropertyChangeListener(PropertyChangeListener l);
-	
+public interface IGraphicViewModel extends IViewModel {
 	//graphic (only these are properties)
 	String getGraphicTitle();
 	String getTilesLabel();
 	List<String> getCategories();
 	Map<String,List<Double>> getData();
 	List<String> getLegend();
+	boolean isLegendVisible();
+	boolean isPercentValues();
 	
 	//menus
 	static final String DEFAULT_SR="Tutte";

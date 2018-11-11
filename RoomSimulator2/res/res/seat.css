@@ -1,0 +1,32 @@
+.chair,.table {
+	-fx-label-padding: 0;
+	-fx-cursor: hand;
+}
+.chair .box,.table .box {
+	-fx-background-radius: 0;
+	-fx-background-color: transparent;
+	-fx-border-width: 0;
+	-fx-padding: 0;
+}
+
+.chair .mark,.table .mark {
+	-fx-background-position: center;
+	-fx-background-repeat: stretch;
+	-fx-shape: none;
+	-fx-padding: 20;
+}
+.chair .mark {
+	-fx-background-image: url("chair_free.png");
+}
+.table .mark {
+	-fx-background-image: url("table_free.png");
+}
+.chair:selected .mark,.table:selected .mark {
+	-fx-background-color: transparent;
+}
+.chair:selected .mark {
+	-fx-background-image: url("chair_occupied.png");
+}
+.table:selected .mark {
+	-fx-background-image: url("table_occupied.png");
+}

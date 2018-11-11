@@ -6,6 +6,10 @@ function createWebSocket(){
 	}
 	ws.onmessage=function(e){
 		document.getElementById("cont").innerHTML=e.data;
+		if (e.data.includes("<table id=\"legenda\""))
+			document.getElementById("filter").style.display="";
+		else
+			document.getElementById("filter").style.display="none";
 	}
 	ws.onclose=createWebSocket;
 }

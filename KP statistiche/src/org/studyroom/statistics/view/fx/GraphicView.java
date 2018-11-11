@@ -49,7 +49,8 @@ public class GraphicView extends BorderPane {
 		BindingUtil.bindStringOneWay(tit.textProperty(),"graphicTitle",vm);
 		tit.setFont(Font.font("sans-serif",FontWeight.BOLD,24));
 		
-		Histogram h=Histogram.create(vm,"data","categories","tilesLabel");
+		Histogram h=Histogram.create(vm,"data","categories","tilesLabel","legendVisible","percentValues");
+		mb.getMenus().get(2).disableProperty().bind(h.legendVisibleProperty().not());	//when legend is not shown, filter menu should be disabled
 		
 		VBox p=new VBox(tit,h);
 		p.setAlignment(Pos.CENTER);

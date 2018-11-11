@@ -32,7 +32,7 @@ public class RoomViewModel extends ViewModel implements IRoomViewModel {
 
 	@Override
 	public void selectStudyRoom(String name, String university){
-		sr=studyRooms.getOrDefault(university,Collections.emptyList()).stream().filter(s->s.getName().equals(university)).findAny().orElseThrow(()->new IllegalArgumentException("Study room \""+name+"\" not found in university "+university));
+		sr=studyRooms.getOrDefault(university,Collections.emptyList()).stream().filter(s->s.getName().equals(name)).findAny().orElseThrow(()->new IllegalArgumentException("Study room \""+name+"\" not found in university "+university));
 		firePropertyChange("selectedRoomName",null,getSelectedRoomName());
 		firePropertyChange("tables",null,getTables());
 	}
@@ -64,6 +64,7 @@ public class RoomViewModel extends ViewModel implements IRoomViewModel {
 			throw new IllegalArgumentException("Unknown sensor "+sensorID);
 		if (state==sensors.get(sensorID).isOn())
 			return;
+		System.out.println(sensorID+" state changed");
 		if (state)
 			sensors.get(sensorID).set();
 		else

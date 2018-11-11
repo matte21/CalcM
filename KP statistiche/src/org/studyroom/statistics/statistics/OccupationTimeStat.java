@@ -3,12 +3,13 @@ package org.studyroom.statistics.statistics;
 import java.util.*;
 import java.util.stream.*;
 import org.studyroom.statistics.persistence.*;
+import static org.studyroom.statistics.statistics.Statistic.SeatState.*;
 
 public class OccupationTimeStat extends RealTimeStatistic {
-	private final Map<String,SeatOccupation> seat=new HashMap<>();
+	private final Map<String,SeatOccupation> seats=new HashMap<>();
 	private final Map<String,List<SeatOccupation>> val=new TreeMap<>();
 	public OccupationTimeStat(){
-		super(false,true);
+		super(false,true,false,true);
 		for (String id : Persistence.getInstance().getStudyRoomsIDs())
 			val.put(id,new LinkedList<>());
 	}
@@ -22,23 +23,23 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	}
 	@Override
 	protected void onSeatStateChanged(SeatStateChangedEvent e){
-		byte s=e.isSeatAvailable()?Seat.FREE:e.isSeatPartiallyAvailable()?Seat.PARTIAL:Seat.FULL;
+		SeatState s=e.isSeatAvailable()?FREE:e.isSeatPartiallyAvailable()?PARTIAL:FULL;
 		if (e.isInitEvent()){
-			seat.put(e.getSeatID(),new SeatOccupation.Invalid(s));
+			seats.put(e.getSeatID(),new SeatOccupation.Invalid(s));
 			return;
 		}
-		if (seat.containsKey(e.getSeatID())){
-			SeatOccupation so=seat.get(e.getSeatID());
+		if (seats.containsKey(e.getSeatID())){
+			SeatOccupation so=seats.get(e.getSeatID());
 			so.setState(s);
 			if (so.isSetFree()){
-				seat.remove(e.getSeatID());
+				seats.remove(e.getSeatID());
 				if (so.toValue()!=null){
 					val.get(e.getStudyRoomID()).add(so);
 					notifyValueChange(Persistence.getInstance().getStudyRoomName(e.getStudyRoomID()),getValue(e.getStudyRoomID()));
 				}
 			}
-		} else if (s!=Seat.FREE)
-			seat.put(e.getSeatID(),new SeatOccupation(s));
+		} else if (s!=FREE)
+			seats.put(e.getSeatID(),new SeatOccupation(s));
 	}
 	@Override
 	public Map<String,Value> getValues(String srID){
@@ -49,15 +50,20 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	}
 	private Value getValue(String srID){
 		List<SeatOccupation> l=val.get(srID);
-		return l.parallelStream().map(SeatOccupation::toValue).reduce((v1,v2)->new IntValue(v1.getFull()+v2.getFull(),v1.getPartial()+v2.getPartial())).map(v->new Value(v.getFull()/60.0f/l.size(),v.getPartial()/60.0f/l.size())).orElse(new Value(0,0));
+		return l.parallelStream().map(SeatOccupation::toValue).filter(v->v!=null).reduce((v1,v2)->new IntValue(v1.getFull()+v2.getFull(),v1.getPartial()+v2.getPartial())).map(v->new Value(v.getFull()/60.0f/l.size(),v.getPartial()/60.0f/l.size())).orElse(new Value(0,0));
 	}
 	@Override
 	protected void loadStatisticData(Map<String,Map<String,String>> data){
+		System.out.println(data);
 		data.forEach((sr,m)->{
 			List<SeatOccupation> l=val.get(sr);
-			for (String s : m.values())
-				l.add(new SeatOccupation(new TreeMap<>(Arrays.stream(s.split(" ")).map(e->e.split(":")).collect(Collectors.toMap(e->Long.parseLong(e[0]),e->Byte.parseByte(e[1]))))));
+			if (l!=null)
+				for (String s : m.values())
+					l.add(new SeatOccupation(new TreeMap<>(Arrays.stream(s.split(" ")).map(e->e.split(":")).collect(Collectors.toMap(e->Long.parseLong(e[0]),e->SeatState.valueOf(e[1]))))));
+			else
+				System.err.println(getName()+": unknown room \""+sr+"\" in data file");
 		});
+		System.out.println(val);
 	}
 	@Override
 	protected Map<String,Map<String,String>> saveStatisticData(){
@@ -71,28 +77,28 @@ public class OccupationTimeStat extends RealTimeStatistic {
 		return msr;
 	}
 	protected static class SeatOccupation {
-		private SortedMap<Long,Byte> states=new TreeMap<>();
+		private SortedMap<Long,SeatState> states=new TreeMap<>();
 		protected boolean closed;
-		public SeatOccupation(byte state){
-			if (state!=Seat.PARTIAL && state!=Seat.FULL)
+		public SeatOccupation(SeatState state){
+			if (state==FREE)
 				throw new IllegalArgumentException("Illegal state");
+			closed=false;
 			setState(state);
 		}
-		SeatOccupation(SortedMap<Long,Byte> m){
+		SeatOccupation(SortedMap<Long,SeatState> m){
 			states=m;
+			closed=m.get(m.lastKey())==FREE;
 		}
 		public boolean isSetFree(){
 			return closed;
 		}
-		public byte getState(){
+		public SeatState getState(){
 			return states.get(states.lastKey());
 		}
-		void setState(byte state){
+		void setState(SeatState state){
 			if (closed)
 				throw new UnsupportedOperationException("Seat occupation already set free");
-			if (state>Seat.FULL || state<Seat.FREE)
-				throw new IllegalArgumentException("Illegal state");
-			if (state==Seat.FREE)
+			if (state==FREE)
 				closed=true;
 			if (states.isEmpty() || state!=states.get(states.lastKey()))
 				states.put(System.currentTimeMillis(),state);
@@ -104,9 +110,9 @@ public class OccupationTimeStat extends RealTimeStatistic {
 			final long PAUSE_TIME=300000;
 			int f,p=(int)((states.lastKey()-states.firstKey())/1000);
 			long s=-1,p1=-1,t=0,/*n=0,*/k=0;
-			for (Map.Entry<Long,Byte> e : states.entrySet()){
+			for (Map.Entry<Long,SeatState> e : states.entrySet()){
 				k=e.getKey();
-				if (s<0 && k!=Seat.FULL)
+				if (s<0 && e.getValue()!=FULL)
 					continue;
 				if (s<0)
 					s=k;
@@ -129,18 +135,18 @@ public class OccupationTimeStat extends RealTimeStatistic {
 			return new IntValue(f,p-f);
 		}
 		public static class Invalid extends SeatOccupation {
-			byte s;
-			public Invalid(byte state){
+			SeatState s;
+			public Invalid(SeatState state){
 				super(state);
 			}
 			@Override
-			public byte getState(){
+			public SeatState getState(){
 				return s;
 			}
 			@Override
-			void setState(byte state){
+			void setState(SeatState state){
 				s=state;
-				if (state==Seat.FREE)
+				if (state==FREE)
 					closed=true;
 			}
 			@Override

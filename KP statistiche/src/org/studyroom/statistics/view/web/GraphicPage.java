@@ -52,7 +52,7 @@ public class GraphicPage extends HTMLPage {
 		html.append(
 				"				</ul>\n"+
 				"			</li>\n"+
-				"			<li class=\"submenu\">\n"+
+				"			<li class=\"submenu\" id=\"filter\">\n"+
 				"				<div>Visualizzazione</div>\n"+
 				"				<ul>\n");
 		for (String v : vm.getVisualizations())
@@ -86,7 +86,7 @@ public class GraphicPage extends HTMLPage {
 				"			<rect class=\"axis\" x=\"100\" y=\""+(H-50)+"\" width=\""+(W-190)+"\" height=\"1\"></rect>\n"+
 				"			<text class=\"num\" x=\"86\" y=\""+(H-44.6)+"\">0</text>\n");
 		Map<String,List<Double>> data=vm.getData();
-		double max=Math.max(data.values().stream().mapToDouble(l->l.stream().mapToDouble(Double::doubleValue).sum()).max().orElse(1),1);
+		double max=vm.isPercentValues()?100:Math.max(data.values().stream().mapToDouble(l->l.stream().mapToDouble(Double::doubleValue).sum()).max().orElse(1),1);
 		double scaleY=(H-100)/max;
 		long og=Math.max((long)Math.log10(max),0);
 		og=(long)Math.pow(10,og);
@@ -122,15 +122,17 @@ public class GraphicPage extends HTMLPage {
 		}
 		html.append(
 				"			<text class=\"cat\" x=\"50\" y=\""+H/2+"\" transform=\"rotate(-90 50,"+H/2+")\">"+vm.getTilesLabel()+"</text>\n"+
-				"		</svg>\n"+
-				"		<table id=\"legenda\">\n");
-		for (i=0;i<vm.getLegend().size();i++)
-			html.append(
-					"			<tr>\n"+
-					"				<td><div class=\"graph"+(i+1)+"\">&nbsp; &nbsp; &nbsp; </div></td>\n"+
-					"				<td>"+vm.getLegend().get(i)+"</td>\n"+
-					"			</tr>\n");
-		html.append("		</table>");
+				"		</svg>\n");
+		if (vm.isLegendVisible()){
+			html.append("		<table id=\"legenda\">\n");
+			for (i=0;i<vm.getLegend().size();i++)
+				html.append(
+						"			<tr>\n"+
+						"				<td><div class=\"graph"+(i+1)+"\">&nbsp; &nbsp; &nbsp; </div></td>\n"+
+						"				<td>"+vm.getLegend().get(i)+"</td>\n"+
+						"			</tr>\n");
+			html.append("		</table>\n");
+		}
 		return html.toString();
 	}
 	public static class Socket extends WebSocketHandler {

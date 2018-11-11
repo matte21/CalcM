@@ -9,7 +9,7 @@ import org.studyroom.statistics.persistence.*;
 import org.studyroom.util.*;
 
 public abstract class Statistic {
-	protected static final String SAVE_PATH="./statistics";
+	protected static final String SAVE_PATH="../KP statistiche/statistics";
 	private static final Map<String,Statistic> statistics=new LinkedHashMap<>();
 	private static final Timer timer=new Timer("StatisticTimer",true);
 	public static Statistic get(String name){
@@ -26,8 +26,12 @@ public abstract class Statistic {
 				srt,
 				new DailyStat(),
 				new WeeklyStat(),
-				new OccupationTimeStat()
-				//new ...()	TODO
+				new OccupationTimeStat(),
+				new EfficiencyStatFull(),
+				new EfficiencyStatFree(),
+				new EfficiencyTimeStatFull(),
+				new EfficiencyTimeStatFree()
+				//new ...()
 		};
 		File d=new File(SAVE_PATH);
 		boolean load=d.exists();
@@ -41,8 +45,8 @@ public abstract class Statistic {
 						System.err.println(f.getAbsolutePath()+" danneggiato");
 					}
 			}
-			if (s instanceof PeriodicStatistic)
-				srt.addIntValueListener((PeriodicStatistic)s);
+			if (s instanceof IntValueChangedListener)
+				srt.addIntValueListener((IntValueChangedListener)s);
 			else if (s instanceof RealTimeStatistic)
 				Persistence.getInstance().addObserver((RealTimeStatistic)s);
 			statistics.put(s.getName(),s);
@@ -90,16 +94,24 @@ public abstract class Statistic {
 	
 	private final List<CategoryChangedListener> catListeners=new LinkedList<>();
 	private final List<StatisticValueChangedListener> valListeners=new LinkedList<>();
-	private final boolean additive, singleValue;
-	protected Statistic(boolean additive, boolean singleValue){
+	private final boolean additive, singleValue, percent, onSeats;
+	protected Statistic(boolean additive, boolean singleValue, boolean percent, boolean onSeats){
 		this.additive=additive;
 		this.singleValue=singleValue;
+		this.percent=percent;
+		this.onSeats=onSeats;
 	}
 	public boolean isAdditive(){
 		return additive;
 	}
 	public boolean isSingleValue(){
 		return singleValue;
+	}
+	public boolean isPercent(){
+		return percent;
+	}
+	public boolean isOnSeats(){
+		return onSeats;
 	}
 	public boolean accept(Aggregator a){
 		return !((a.isAdditive()&& !additive)||(a.isComparison()&& !singleValue));
@@ -200,5 +212,8 @@ public abstract class Statistic {
 	}
 	protected static interface IntValueChangedListener {
 		void onValueChanged(String studyRoomID, IntValue newValue);
+	}
+	protected static enum SeatState {
+		FREE, PARTIAL, FULL;
 	}
 }

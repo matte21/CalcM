@@ -6,6 +6,7 @@ import java.util.*;
 public class Seat implements Serializable {
 	private static final long serialVersionUID=1L;
 	private String id;
+	private Table table;
 	private String[] features;
 	private boolean cAvailable=true, dAvailable=true;
 	public Seat(String id){
@@ -17,6 +18,12 @@ public class Seat implements Serializable {
 	}
 	public String getID(){
 		return id;
+	}
+	public Table getTable(){
+		return table;
+	}
+	void setTable(Table table){
+		this.table = table;
 	}
 	public String[] getFeatures(){
 		return Arrays.copyOf(features,features.length);

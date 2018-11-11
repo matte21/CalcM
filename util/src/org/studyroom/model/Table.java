@@ -6,11 +6,14 @@ import java.util.*;
 public class Table implements Serializable {
 	private static final long serialVersionUID=1L;
 	private String ID;
+	private StudyRoom room;
 	private Seat[] seats;
 	private String[] features;
 	public Table(String ID, Seat[] seats){
 		this.ID=ID;
 		this.seats=seats;
+		for (Seat s : seats)
+			s.setTable(this);
 	}
 	public Table(String ID, Seat[] seats, String...features){
 		this(ID,seats);
@@ -18,6 +21,12 @@ public class Table implements Serializable {
 	}
 	public String getID(){
 		return ID;
+	}
+	public StudyRoom getStudyRoom(){
+		return room;
+	}
+	void setStudyRoom(StudyRoom room){
+		this.room = room;
 	}
 	public String[] getFeatures(){
 		return Arrays.copyOf(features,features.length);

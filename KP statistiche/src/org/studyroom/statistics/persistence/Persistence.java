@@ -27,13 +27,13 @@ public abstract class Persistence extends Observable {
 	protected Persistence(){
 		setInstance(this);
 	}
-	protected void notifyObservers(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
+	protected void notifyObservers(Seat seat, SeatStateChange change){
 		setChanged();
-		notifyObservers(new SeatStateChangedEvent(seatID,tableID,studyRoomID,change,other));
+		notifyObservers(new SeatStateChangedEvent(seat,change));
 	}
-	protected void initObservers(String seatID, String tableID, String studyRoomID, SeatStateChange change, SeatStateChange other){
+	protected void initObservers(Seat seat, SeatStateChange change){
 		setChanged();
-		notifyObservers(new SeatStateChangedEvent(seatID,tableID,studyRoomID,change,other,true));
+		notifyObservers(new SeatStateChangedEvent(seat,change,true));
 	}
 	public abstract Collection<StudyRoom> getStudyRooms();
 	public Collection<String> getStudyRoomsNames(){
@@ -42,10 +42,19 @@ public abstract class Persistence extends Observable {
 	public Collection<String> getStudyRoomsIDs(){
 		return getStudyRooms().stream().map(StudyRoom::getID).collect(Collectors.toList());
 	}
-	public String getStudyRoomName(String ID){
-		return getStudyRooms().stream().filter(r->r.getID().equals(ID)).map(StudyRoom::getName).findFirst().orElseThrow(()->new IllegalArgumentException("ID "+ID+" not found"));
-	}
 	public StudyRoom getStudyRoom(String ID){
 		return getStudyRooms().stream().filter(r->r.getID().equals(ID)).findFirst().orElseThrow(()->new IllegalArgumentException("ID "+ID+" not found"));
+	}
+	public String getStudyRoomName(String ID){
+		return getStudyRoom(ID).getName();
+	}
+	public Collection<Seat> getSeats(){
+		return getStudyRooms().stream().flatMap(sr->Arrays.stream(sr.getTables())).flatMap(t->Arrays.stream(t.getSeats())).collect(Collectors.toList());
+	}
+	public Collection<Seat> getSeats(String studyRoomID){
+		return Arrays.stream(getStudyRoom(studyRoomID).getTables()).flatMap(t->Arrays.stream(t.getSeats())).collect(Collectors.toList());
+	}
+	public Seat getSeat(String studyRoomID, String seatID){
+		return getStudyRoom(studyRoomID).getSeat(seatID);
 	}
 }

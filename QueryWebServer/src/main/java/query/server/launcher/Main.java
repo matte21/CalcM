@@ -15,6 +15,7 @@ import query.server.handlers.WsFiltersHandler;
 import query.server.utils.SibConnectionFactory;
 import query.server.utils.query.PrefixedQueryUtilsFactory;
 
+
 public class Main {
 
 	private static final Logger LOG = LogManager.getLogger();
@@ -71,7 +72,16 @@ public class Main {
 		LOG.debug("Routes successfully added to web server.");	
 
 		LOG.info("Query web server is about to start...");
-		server.start(0, false);
+		if (Thread.currentThread().getStackTrace().length==2){
+			WebServer s=WebServer.getInstance();
+			if (!s.wasStarted())
+				try {
+					System.out.println("Starting web server");
+					s.start(0,false);	//default:true
+				} catch (IOException e){
+					e.printStackTrace();
+				}
+		}
 		LOG.info("Query web server is now listening on port 80.");
 	}
 

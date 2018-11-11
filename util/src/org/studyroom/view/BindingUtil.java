@@ -133,21 +133,21 @@ public class BindingUtil {
 	public static void bindBooleanOneWay(BooleanProperty fxProp, String prop, Object viewModel){
 		try {
 			//fxProp.bind(ReadOnlyJavaBeanStringPropertyBuilder.create().bean(viewModel).name(prop).build());
-			fxProp.bind(new JavaBeanBooleanProperty(viewModel,prop));
+			fxProp.bind(new ReadOnlyJavaBeanBooleanProperty(viewModel,prop));
 		} catch (NoSuchMethodException e){
 			throw new IllegalArgumentException(e);
 		}
 	}
 	public static void bindBooleanOneWay(BooleanProperty fxProp, String prop, Object viewModel, String id){
 		try {
-			fxProp.bind(new JavaBeanBooleanProperty(viewModel,prop,id,String.class));
+			fxProp.bind(new ReadOnlyJavaBeanBooleanProperty(viewModel,prop,id,String.class));
 		} catch (NoSuchMethodException e){
 			throw new IllegalArgumentException(e);
 		}
 	}
 	public static void bindBooleanOneWay(BooleanProperty fxProp, String prop, Object viewModel, int index){
 		try {
-			fxProp.bind(new JavaBeanBooleanProperty(viewModel,prop,index,Integer.TYPE));
+			fxProp.bind(new ReadOnlyJavaBeanBooleanProperty(viewModel,prop,index,Integer.TYPE));
 		} catch (NoSuchMethodException e){
 			throw new IllegalArgumentException(e);
 		}
@@ -178,21 +178,21 @@ public class BindingUtil {
 	public static void bindIntegerOneWay(IntegerProperty fxProp, String prop, Object viewModel){
 		try {
 			//fxProp.bind(ReadOnlyJavaBeanStringPropertyBuilder.create().bean(viewModel).name(prop).build());
-			fxProp.bind(new JavaBeanIntegerProperty(viewModel,prop));
+			fxProp.bind(new ReadOnlyJavaBeanIntegerProperty(viewModel,prop));
 		} catch (NoSuchMethodException e){
 			throw new IllegalArgumentException(e);
 		}
 	}
 	public static void bindIntegerOneWay(IntegerProperty fxProp, String prop, Object viewModel, String id){
 		try {
-			fxProp.bind(new JavaBeanIntegerProperty(viewModel,prop,id,String.class));
+			fxProp.bind(new ReadOnlyJavaBeanIntegerProperty(viewModel,prop,id,String.class));
 		} catch (NoSuchMethodException e){
 			throw new IllegalArgumentException(e);
 		}
 	}
 	public static void bindIntegerOneWay(IntegerProperty fxProp, String prop, Object viewModel, int index){
 		try {
-			fxProp.bind(new JavaBeanIntegerProperty(viewModel,prop,index,Integer.TYPE));
+			fxProp.bind(new ReadOnlyJavaBeanIntegerProperty(viewModel,prop,index,Integer.TYPE));
 		} catch (NoSuchMethodException e){
 			throw new IllegalArgumentException(e);
 		}
@@ -356,23 +356,123 @@ public class BindingUtil {
 		}
 	}
 	/**Create and register a {@link PropertyChangeListener} for the desired property, 
-	 * which invokes {@code listener} with the new value of the property.
+	 * which invokes {@code listener} with the new value of the property.<br>
+	 * The {@code listener} is also invoked immediatly with the current value of the property.<br>
+	 * Don't use with boolean properties, use instead {@code addBooleanPropertyListener}.
 	 * @param prop - the property name
 	 * @param viewModel - the object that owns the property
 	 * @param listener - the action to do on new values
 	 * @return the {@link PropertyChangeListener} registered 
 	 */
-	public static PropertyChangeListener addPropertyListener(String prop, Object viewModel, Consumer<Object> listener){
+	@SuppressWarnings("unchecked")
+	public static <T> PropertyChangeListener addPropertyListener(String prop, Object viewModel, Consumer<T> listener){
+		PropertyChangeListener l=e->{
+			if (e.getPropertyName().equals(prop))
+				listener.accept((T)e.getNewValue());
+		};
 		try {
-			PropertyChangeListener l=e->{
-				if (e.getPropertyName().equals(prop))
-					listener.accept(e.getNewValue());
-			};
 			viewModel.getClass().getMethod("addPropertyChangeListener",PropertyChangeListener.class).invoke(viewModel,l);
-			return l;
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
 			throw new IllegalArgumentException("view-model object does not accept property change listeners",e);
 		}
+		try {
+			listener.accept((T)viewModel.getClass().getMethod(getter(prop)).invoke(viewModel));
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
+			System.err.println("Property initialization failed for property listener of \""+prop+"\": property getter not found");
+		}
+		return l;
+	}
+	/**Create and register a {@link PropertyChangeListener} for the desired property, 
+	 * which invokes {@code listener} with the new value of the property.<br>
+	 * The {@code listener} is also invoked immediatly with the current value of the property.
+	 * @param prop - the property name
+	 * @param viewModel - the object that owns the property
+	 * @param listener - the action to do on new values
+	 * @return the {@link PropertyChangeListener} registered 
+	 */
+	public static PropertyChangeListener addBooleanPropertyListener(String prop, Object viewModel, Consumer<Boolean> listener){
+		PropertyChangeListener l=e->{
+			if (e.getPropertyName().equals(prop))
+				listener.accept((Boolean)e.getNewValue());
+		};
+		try {
+			viewModel.getClass().getMethod("addPropertyChangeListener",PropertyChangeListener.class).invoke(viewModel,l);
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
+			throw new IllegalArgumentException("view-model object does not accept property change listeners",e);
+		}
+		try {
+			listener.accept((Boolean)viewModel.getClass().getMethod(booleanGetter(prop)).invoke(viewModel));
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
+			new IllegalArgumentException("Property initialization failed: property getter not found",e).printStackTrace();
+		}
+		return l;
+	}
+	/**Create and register a {@link PropertyChangeListener} for the desired property, 
+	 * which invokes {@code listener} with the new value of the property.<br>
+	 * The {@code listener} is also invoked immediatly with the current value of the property.
+	 * @param prop - the property name
+	 * @param viewModel - the object that owns the property
+	 * @param listener - the actions to do on changes
+	 * @return the {@link PropertyChangeListener} registered
+	 */
+	public static <T> PropertyChangeListener addListPropertyListener(String prop, Object viewModel, ListPropertyListener<T> listener){
+		return addListPropertyListener(prop,viewModel,listener::onAdd,listener::onUpdate,listener::onRemove);
+	}
+	/**Create and register a {@link PropertyChangeListener} for the desired property, 
+	 * which invokes {@code listener} with the new value of the property.<br>
+	 * The {@code listener} is also invoked immediatly with the current value of the property.
+	 * @param prop - the property name
+	 * @param viewModel - the object that owns the property
+	 * @param onAdd - the action to do on inserted values (parameters: index and new value)
+	 * @param onUpdate - the action to do on updated values (parameters: index and new value)
+	 * @param onRemove - the action to do on removed values (parameters: index and old value)
+	 * @return the {@link PropertyChangeListener} registered
+	 */
+	public static <T> PropertyChangeListener addListPropertyListener(String prop, Object viewModel, BiConsumer<Integer,T> onAdd, BiConsumer<Integer,T> onUpdate, BiConsumer<Integer,T> onRemove){
+		@SuppressWarnings("unchecked")
+		PropertyChangeListener l=e->{
+			if (e.getPropertyName().equals(prop))
+				if (e instanceof IndexedPropertyChangeEvent){
+					IndexedPropertyChangeEvent ie=(IndexedPropertyChangeEvent)e;
+					T oldV=(T)ie.getOldValue(), newV=(T)ie.getNewValue();
+					if (newV!=null && oldV!=null)
+						onUpdate.accept(ie.getIndex(),newV);
+					else if (newV!=null)
+						onAdd.accept(ie.getIndex(),newV);
+					else if (oldV!=null)
+						onRemove.accept(ie.getIndex(),oldV);
+				} else {
+					List<T> oldL=(List<T>)e.getOldValue(), newL=(List<T>)e.getNewValue();
+					if (newL!=null && oldL!=null){
+						int oldS=oldL.size(),newS=newL.size(),minS=Math.min(oldS,newS),i;
+						for (i=0;i<minS;i++)
+							if (oldL.get(i)!=newL.get(i))
+								onUpdate.accept(i,newL.get(i));
+						if (newS>oldS)
+							for (;i<newS;i++)
+								onAdd.accept(i,newL.get(i));
+						else
+							for (;i<oldS;i++)
+								onRemove.accept(i,oldL.get(i));
+				} else if (newL!=null)
+						for (int i=0;i<newL.size();i++)
+							onAdd.accept(i,newL.get(i));
+					else if (oldL!=null)
+						for (int i=0;i<oldL.size();i++)
+							onRemove.accept(i,oldL.get(i));
+				}
+		};
+		try {
+			viewModel.getClass().getMethod("addPropertyChangeListener",PropertyChangeListener.class).invoke(viewModel,l);
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
+			throw new IllegalArgumentException("view-model object does not accept property change listeners",e);
+		}
+		try {
+			l.propertyChange(new PropertyChangeEvent(viewModel,prop,null,viewModel.getClass().getMethod(getter(prop)).invoke(viewModel)));
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
+			new IllegalArgumentException("Property initialization failed: property getter not found",e).printStackTrace();
+		}
+		return l;
 	}
 	private static void onFXPlatform(Runnable r){
 		if (Platform.isFxApplicationThread())
@@ -382,6 +482,9 @@ public class BindingUtil {
 	}
 	private static String getter(String prop){
 		return "get"+prop.substring(0,1).toUpperCase()+prop.substring(1);
+	}
+	private static String booleanGetter(String prop){
+		return "is"+prop.substring(0,1).toUpperCase()+prop.substring(1);
 	}
 	private static String setter(String prop){
 		return "set"+prop.substring(0,1).toUpperCase()+prop.substring(1);
@@ -449,7 +552,7 @@ public class BindingUtil {
 		public ReadOnlyJavaBeanBooleanProperty(Object bean, String name, Object param, Class<?> paramType) throws NoSuchMethodException {
 			this.bean=bean;
 			this.name=name;
-			getter=param==null?bean.getClass().getMethod(getter(name)):bean.getClass().getMethod(getter(name),paramType);
+			getter=param==null?bean.getClass().getMethod(booleanGetter(name)):bean.getClass().getMethod(getter(name),paramType);
 			boolean v;
 			try {
 				v=(boolean)(param==null?getter.invoke(bean):getter.invoke(bean,param));
@@ -736,4 +839,10 @@ public class BindingUtil {
 			}
 		}
 	}
+	public static interface ListPropertyListener<T> {
+		void onAdd(int i, T newValue);
+		void onUpdate(int i, T newValue);
+		void onRemove(int i, T oldValue);
+	}
+
 }

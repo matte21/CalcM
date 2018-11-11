@@ -36,7 +36,7 @@ public class KPSensorSimulator {
 	}
 	private StudyRoom loadStudyRoom(String id){
 		List<String[]> srq=query(sib,sparqlPrefix("sr","rdf")+"SELECT ?n ?u WHERE {"
-				+ "?"+id+"	rdf:type sr:StudyRoom;"
+				+ "sr:"+id+"	rdf:type sr:StudyRoom;"
 				+ "		sr:hasName ?n;"
 				+ "		sr:inUniversity ?uid."
 				+ "?uid	sr:hasUniversityID ?u}").stream().findFirst().orElseThrow(()->new IllegalArgumentException("Unknown studyroom ID: "+id));
