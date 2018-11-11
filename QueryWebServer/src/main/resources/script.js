@@ -1,9 +1,5 @@
 "use strict";
 
-// TODO 121 disable button after first click
-// TODO 122 during a transition from one sub to another notifications should be disabled
-// TODO 132 implement callbacks
-
 var ws;
 var lastSetOfMatchingRooms;
 const httpBaseURL = "http://localhost:80/filters?"; 
@@ -46,7 +42,35 @@ function sendRequestWFilters() {
     }
     var queryString = buildQueryStringFromFiltersFieldSet(filtersFieldSet);
     var requestURL  = httpBaseURL + queryString;
+    
+    if (positionIsNeeded(queryString) && !navigator.geolocation) {
+        window.alert("Geolocation is not enabled on this device, hence the \"within X kms filter\" is not supported.");
+        return
+    }
 
+    if (positionIsNeeded(queryString)) {
+        console.log("retrieving latitude and longitude...")
+        navigator.geolocation.getCurrentPosition( 
+
+            function(position) {
+                queryString += "&latitude=" + position.coords.latitude + "&longitude=" + position.coords.longitude;
+                var requestURL  = httpBaseURL + queryString;
+                console.log("query string: " + queryString);
+                //window.alert(queryString);
+                issueAjaxReq(queryString, requestURL);
+            },
+
+            function(error) {
+                document.getElementById(resultsDisplayerParentID).innerHTML = "<p>" + error.message + "</p>";
+            }
+
+        )
+    } else {
+        issueAjaxReq(queryString, requestURL);
+    }
+}
+
+function issueAjaxReq(queryString, requestURL) {
     // Issue AJAX request with filters
     var filteredRequest = new XMLHttpRequest();
     
@@ -61,8 +85,13 @@ function sendRequestWFilters() {
         }
     }
 
+    console.log("Sending filtered request with URL " + requestURL);
     filteredRequest.open("GET", requestURL, true);
     filteredRequest.send();
+}
+
+function positionIsNeeded(queryString) {
+    return queryString.includes("withinKM");
 }
 
 function displayQueryResults(roomsInResults, additionalHeaderMsg) {
@@ -138,6 +167,11 @@ function maybeOpenWsConnectionAndSendMsg(msg, htmlNotifButtonID) {
     htmlNotifButton.removeEventListener("click", notifClickCallback);
     htmlNotifButton.parentNode.removeChild(htmlNotifButton);
     
+    if (document.getElementById("withinKM").value) {
+        window.alert("Notifications are not enabled if you specify a range in kms for the study rooms.");
+        return
+    }
+
     document.getElementById("matching_filters_header").innerHTML += " - real-time results";
     
     if (!ws) {
@@ -249,8 +283,11 @@ function encodeNumberForQueryString(numberFilter) {
 
 
 function validateFields() {
-    var availSeats = document.getElementById("availSeats");
-    
+    var availSeats = document.getElementById("availSeats");    
+    if (!Number.isInteger(Number(availSeats.value))) {
+        window.alert("Number of available seats must be an integer");
+        return false;
+    }
     if (availSeats.min && availSeats.value && availSeats.value < availSeats.min) {
         window.alert("Number of available seats must be bigger than " + availSeats.min);    
         return false;
@@ -259,8 +296,51 @@ function validateFields() {
         window.alert("Number of available seats must be smaller than " +  availSeats.max);
         return false;
     }
-    if (!Number.isInteger(Number(availSeats.value))) {
-        window.alert("Number of available seats must be an integer");
+
+    var openForAtLeast = document.getElementById("openForAtLeast");    
+    if (!Number.isInteger(Number(openForAtLeast.value))) {
+        window.alert("The number of minutes the room has to be open for must be an integer");
+        return false;
+    }
+    if (openForAtLeast.min && openForAtLeast.value && openForAtLeast.value < openForAtLeast.min) {
+        window.alert("The number of minutes the room has to be open for must be bigger than " + openForAtLeast.min);    
+        return false;
+    }
+    if (openForAtLeast.max && openForAtLeast.value && openForAtLeast.value > openForAtLeast.max) {
+        window.alert("The number of minutes the room has to be open for must be smaller than " +  openForAtLeast.max);
+        return false;
+    }
+    var roomState = document.getElementById("roomState")
+    if (openForAtLeast.value && !roomState.checked) {
+        window.alert("To specify the number of minutes a room must be opened for you must also check the \"only open rooms\" checkbox")
+        return false;
+    }
+
+    var nearSeats = document.getElementById("nearSeats");    
+    if (!Number.isInteger(Number(nearSeats.value))) {
+        window.alert("The number of near seats must be an integer");
+        return false;
+    }
+    if (nearSeats.min && nearSeats.value && nearSeats.value < nearSeats.min) {
+        window.alert("The number of near seats must be bigger than " + nearSeats.min - 1);    
+        return false;
+    }
+    if (nearSeats.max && nearSeats.value && nearSeats.value > nearSeats.max) {
+        window.alert("The number of near seats must be smaller than " +  nearSeats.max + 1);
+        return false;
+    }
+
+    var withinKM = document.getElementById("withinKM");    
+    if (!Number.isInteger(Number(withinKM.value))) {
+        window.alert("The number of kms must be an integer");
+        return false;
+    }
+    if (withinKM.min && withinKM.value && withinKM.value < withinKM.min) {
+        window.alert("The number of kms must be bigger than " + withinKM.min - 1);    
+        return false;
+    }
+    if (withinKM.max && withinKM.value && withinKM.value > withinKM.max) {
+        window.alert("The number of kms must be smaller than " +  withinKM.max + 1);
         return false;
     }
 

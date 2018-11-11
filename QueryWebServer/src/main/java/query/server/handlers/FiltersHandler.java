@@ -109,6 +109,20 @@ public class FiltersHandler extends SIBFacingHandler {
 					case "feat":
 						queryBuilder = queryBuilder.addWhereFilterOnFeature(paramValue);				
 						break;
+					case "nearSeats":
+						int nbrOfNearSeats = Integer.parseInt(paramValue);
+						if (nbrOfNearSeats == 2) {
+							queryBuilder = queryBuilder.addWhereFilterOnTwoNearSeats();							
+						}
+						if (nbrOfNearSeats == 3) {
+							queryBuilder = queryBuilder.addWhereFilterOnThreeNearSeats();
+						}
+						break;
+					case "latitude":
+						queryBuilder = queryBuilder.selectLatitude();
+						break;
+					case "longitude":
+						queryBuilder = queryBuilder.selectLongitude();
 				}
 			}
 		}
@@ -126,9 +140,32 @@ public class FiltersHandler extends SIBFacingHandler {
 	}
 	
 	private StudyroomQueryResultsParser getQueryResultsParser(IHTTPSession request, SSAP_sparql_response results) {
-		return ((PrefixedQueryUtilsFactory) SIBFacingHandler.getSession(request)
-															.get(QUERY_UTILS_KEY))
-															.newPrefixedQueryResultsExtractor(results);
+		PrefixedQueryUtilsFactory queryUtilsFactory = ((PrefixedQueryUtilsFactory) SIBFacingHandler.getSession(request)
+													   							 				   .get(QUERY_UTILS_KEY));
+		StudyroomQueryResultsParser resultsParser = queryUtilsFactory.newPrefixedQueryResultsExtractor(results);
+		String httpQueryParamsString = request.getQueryParameterString();
+		if (httpQueryParamsString != null && !httpQueryParamsString.trim().isEmpty()) {
+			String[] queryParams = httpQueryParamsString.split("&");
+			for (String param : queryParams) {
+				String[] paramNameAndValue = param.split("=");
+				String paramName = paramNameAndValue[0];
+				String paramValue = paramNameAndValue[1];
+				if (paramName.equalsIgnoreCase("openForAtLeast")) {
+					resultsParser.roomsInCurrentStateForAtLeast(Integer.parseInt(paramValue));
+				}
+				if (paramName.equalsIgnoreCase("withinKM")) {
+					resultsParser.addRangeInKM(Integer.parseInt(paramValue));
+				}
+				if (paramName.equalsIgnoreCase("latitude")) {
+					resultsParser.addLatitude(Double.parseDouble(paramValue));
+				}
+				if (paramName.equalsIgnoreCase("longitude")) {
+					resultsParser.addLongitude(Double.parseDouble(paramValue));
+				}
+			}
+		}	
+		
+		return resultsParser;
 	}
 	
 	private String buildResponseBodyAsJSON(StudyroomQueryResultsParser resultsParser) {

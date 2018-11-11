@@ -54,7 +54,13 @@
         		<input type="checkbox" id="roomState" name="roomState" value="open"> <br>
         		<label for="availSeats">available seats:</label>
         		<input type="number" id="availSeats" name="availSeats" min="1" step="1"><br>
-                
+                <label for="openForAtLeast">open for at least:</label>
+                <input type="number" id="openForAtLeast" name="openForAtLeast" min="1" step="1">&nbsp;minutes from now<br>
+                <label for="nearSeats">near seats (max 3):</label>
+                <input type="number" id="nearSeats" name="nearSeats" min="2" max="3" step="1"><br>
+                <label for="withinKM">within:</label>
+                <input type="number" id="withinKM" name="withinKM" min="0" step="1">&nbsp;kms from your position<br>
+
                 <div id="room-features">
                     <p>Room features:</p>
                     <input type="checkbox" name="feat" value="isAccessible">accessible<br>

@@ -20,6 +20,11 @@ public class PrefixedStudyroomQueryBuilder {
 	private static final String PREFIX = "PREFIX";
 	private static final String SELECT = "SELECT";
 	private static final String WHERE = "WHERE";
+	private String DISTINCT = "";
+
+	private boolean latInSelect;
+	private boolean longInSelect;
+	
 	private static final char SPARQL_VAR_SYMBOL = '?';
 	
 	public PrefixedStudyroomQueryBuilder(Map<String, String> prefixToFullURI, Map<String, String> varsVocabulary) {
@@ -28,6 +33,8 @@ public class PrefixedStudyroomQueryBuilder {
 		varsToSelect = new ArrayList<String>();
 		whereFilters = new ArrayList<String>();
 		filterClauses = new ArrayList<String>();
+		latInSelect = false;
+		longInSelect = false;
 	}
 
 	private String buildPrefixes(Map<String, String> prefixToFullURI) {
@@ -61,7 +68,7 @@ public class PrefixedStudyroomQueryBuilder {
 	}
 	
 	private String buildSelectClause() {
-		builder = new StringBuilder(SELECT).append(" ");
+		builder = new StringBuilder(SELECT).append(" ").append(DISTINCT).append(" ");
 		for (String varName : varsToSelect) {
 			builder.append(varName).append(" ");
 		}
@@ -251,6 +258,7 @@ public class PrefixedStudyroomQueryBuilder {
 		 	   .append("\t?seat1 sr:seatState sr:available . \n")
 		 	   .append("\t?seat2 sr:seatState sr:available .");
 		whereFilters.add(builder.toString());
+		DISTINCT = "DISTINCT";
 		
 		return this;
 	}
@@ -268,6 +276,67 @@ public class PrefixedStudyroomQueryBuilder {
 			   .append(" )");
 		filterClauses.add(builder.toString());
 		
+		return this;
+	}
+
+	public PrefixedStudyroomQueryBuilder addWhereFilterOnThreeNearSeats() {
+		builder = new StringBuilder(varsVocabulary.get("roomID"));
+		builder.append(" ")
+		   	   .append("sr:table ?table . \n")
+		       .append("\t?table sr:seat ?seat1 . \n ")
+		 	   .append("\t?seat1 sr:near ?seat2 . \n")
+		 	   .append("\t?seat2 sr:near ?seat3 . \n")
+		 	   .append("\t?seat1 sr:seatState sr:available . \n")
+		 	   .append("\t?seat2 sr:seatState sr:available . \n")
+		 	   .append("\t?seat3 sr:seatState sr:available . \n");
+		whereFilters.add(builder.toString());
+		
+		builder = new StringBuilder("(");
+		builder.append(" ")
+			   .append("?seat1")
+			   .append(" != ")
+			   .append("?seat3")			   
+			   .append(" )");
+		filterClauses.add(builder.toString());
+		
+		DISTINCT = "DISTINCT";
+		
+		return this;
+	}
+
+	public PrefixedStudyroomQueryBuilder selectLatitude() {
+		varsToSelect.add(varsVocabulary.get("latitude"));
+		
+		if (longInSelect) {
+			builder = new StringBuilder("?point geo:lat ?latitude .");
+		} else {
+			builder = new StringBuilder(varsVocabulary.get("roomID"));
+			builder.append(" ")
+				   .append("geo:location ?point . \n")
+				   .append("?point geo:lat ?latitude .");
+		}
+		whereFilters.add(builder.toString());		
+		
+		latInSelect = true;
+
+		return this;
+	}
+
+	public PrefixedStudyroomQueryBuilder selectLongitude() {
+		varsToSelect.add(varsVocabulary.get("longitude"));
+		
+		if (latInSelect) {
+			builder = new StringBuilder("?point geo:long ?longitude .");
+		} else {
+			builder = new StringBuilder(varsVocabulary.get("roomID"));
+			builder.append(" ")
+				   .append("geo:location ?point . \n")
+				   .append("?point geo:long ?longitude .");		
+		}
+		whereFilters.add(builder.toString());
+
+		longInSelect = true;
+
 		return this;
 	}
 	
