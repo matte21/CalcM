@@ -1,19 +1,14 @@
 package query.server.launcher;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.studyroom.web.WebServer;
-
-import fi.iki.elonen.router.RouterNanoHTTPD.StaticPageHandler;
-import query.server.handlers.FiltersHandler;
+import java.util.*;
+import fi.iki.elonen.router.RouterNanoHTTPD.*;
+import org.apache.logging.log4j.*;
+import org.studyroom.web.*;
+import query.server.handlers.*;
 import query.server.handlers.IndexHandler;
-import query.server.handlers.WsFiltersHandler;
-import query.server.utils.SibConnectionFactory;
-import query.server.utils.query.PrefixedQueryUtilsFactory;
+import query.server.utils.*;
+import query.server.utils.query.*;
 
 
 public class Main {
