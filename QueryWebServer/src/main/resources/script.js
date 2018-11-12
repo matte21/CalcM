@@ -2,8 +2,8 @@
 
 var ws;
 var lastSetOfMatchingRooms;
-const httpBaseURL = "http://localhost:80/filters?"; 
-const wsURL = "ws://localhost:82";
+const httpBaseURL = "http://"+window.location.hostname+"/filters?"; 
+const wsURL = "ws://"+window.location.hostname+":82";
 const newDivForResultsID = "filters_matching_rooms_div";
 const resultsDisplayerParentID = "query_results_container";
 
