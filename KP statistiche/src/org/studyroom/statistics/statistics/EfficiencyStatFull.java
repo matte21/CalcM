@@ -32,7 +32,7 @@ public class EfficiencyStatFull extends RealTimeStatistic implements Statistic.I
 	}
 	private Value getValue(IntValue v){
 		int t=v.getTotal();
-		return new Value(t==0?0:100.0f*v.getFull()/t,0);
+		return new Value(t==0?100:100.0f*v.getFull()/t,0);
 	}
 	@Override
 	protected void loadStatisticData(Map<String,Map<String,String>> data){}

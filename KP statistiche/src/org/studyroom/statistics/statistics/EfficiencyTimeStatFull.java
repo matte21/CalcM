@@ -21,7 +21,7 @@ public class EfficiencyTimeStatFull extends RealTimeStatistic {
 		for (StudyRoom sr : Persistence.getInstance().getStudyRooms()){
 			List<SeatOccupation> l=Arrays.stream(sr.getTables()).flatMap(t->Arrays.stream(t.getSeats())).map(s->seats.get(s.getID())).filter(s->s!=null).collect(Collectors.toList());
 			long full=l.stream().mapToLong(SeatOccupation::getFullTime).sum(), total=l.stream().mapToLong(SeatOccupation::getTotalTime).sum();
-			double r= total==0 ? 0 : (double)full/total;
+			double r= total==0 ? 1 : (double)full/total;
 			Value v=new Value((float)r*100,0);
 			val.put(sr.getID(),v);
 			notifyValueChange(sr.getName(),v);
