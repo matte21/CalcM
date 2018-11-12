@@ -215,7 +215,7 @@ function updateResultsView(newResultsJSON) {
 
     displayQueryResults(lastSetOfMatchingRooms, " - real-time results");
 
-    window.alert("results changed!");
+    //window.alert("results changed!");
 }
 
 function displayErrorAndCloseTheWebSocketConnection(err) {
