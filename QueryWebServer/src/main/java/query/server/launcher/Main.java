@@ -1,6 +1,6 @@
 package query.server.launcher;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,8 +66,8 @@ public class Main {
 		LOG.debug("Adding routes to web server...");		
 		server.addRoute("/", IndexHandler.class);
 		server.addRoute("/filters", FiltersHandler.class);
-		server.addRoute("queryWebServer/src/main/resources/script.js", StaticPageHandler.class);
-		server.addRoute("queryWebServer/src/main/resources/styles.css", StaticPageHandler.class);		
+		server.addRoute("queryWebServer/src/main/resources/.*", StaticPageHandler.class, new File("../queryWebServer/src/main/resources/".replace('/',File.separatorChar)));
+		//server.addRoute("queryWebServer/src/main/resources/styles.css", StaticPageHandler.class);		
 		server.addWebSocketMapping("filters", WsFiltersHandler.class);
 		LOG.debug("Routes successfully added to web server.");	
 

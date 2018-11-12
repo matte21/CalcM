@@ -23,7 +23,6 @@ public class WebApp {
 		s.addRoute("/statistics",GraphicPage.class);
 		s.addRoute("/statistics/rsc/.*",StaticPageHandler.class,new File(".."+File.separator+"web"+File.separator+"statistics"));
 		s.addWebSocketMapping("statistics",GraphicPage.Socket.class);
-		System.out.println(new File(".."+File.separator+"web"+File.separator+"statistics").getAbsolutePath());
 		s.addSessionFinalizer(ss->((IGraphicViewModel)ss.get(VIEW_MODEL_KEY)).unbind());
 	}
 }
