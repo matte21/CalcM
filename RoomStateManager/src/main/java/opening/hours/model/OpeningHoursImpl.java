@@ -2,9 +2,6 @@ package opening.hours.model;
 
 import java.util.Arrays;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import opening.hours.exceptions.IllegalOpeningHoursArrayException;
 import opening.hours.exceptions.NullDayOfWeekAndTimeException;
 

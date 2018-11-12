@@ -1,30 +1,14 @@
 package opening.hours.launcher;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-import java.util.zip.DataFormatException;
-
-import opening.hours.controller.RedSIB09RoomOpenerCloser;
-import opening.hours.controller.RoomOpenerCloser;
-import opening.hours.exceptions.FailedToStartManagingRoomException;
-import opening.hours.exceptions.RoomIsAlreadyManagedException;
-import opening.hours.exceptions.SIBConnectionErrorException;
-import opening.hours.model.DayOfWeekAndTime;
-import opening.hours.model.OpeningHours;
-import opening.hours.model.OpeningHoursImpl;
-import sofia_kp.KPICore;
-import sofia_kp.SIBResponse;
+import java.io.*;
+import java.time.*;
+import java.time.format.*;
+import java.util.*;
+import java.util.zip.*;
+import opening.hours.controller.*;
+import opening.hours.exceptions.*;
+import opening.hours.model.*;
+import sofia_kp.*;
 
 public class RoomStateManagerLauncher {
 

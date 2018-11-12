@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
+import org.studyroom.kp.*;
 import org.studyroom.model.*;
 import org.studyroom.sensor.*;
 import rooms.aggregator.*;
@@ -21,7 +22,7 @@ public class KPSensorSimulator {
 	}
 	public KPSensorSimulator(String host){
 		sib=new KPICore(host,10010,SMART_SPACE_NAME);
-		initNamespaces(getClass().getResourceAsStream("/ontology.owl"));
+		initNamespaces(SIBUtils.class.getResourceAsStream("/ontology.owl"));
 		sib.setProtocol_version(1);
 		//sib.enable_debug_message();//XXX
 		sib.enable_error_message();//XXX
@@ -61,7 +62,7 @@ public class KPSensorSimulator {
 				s.addAll(ms.values());
 			else {
 				//Let's find first and last seat
-				List<Vector<String[]>> sSingle=query(sib,sparqlPrefix("sr")+"SELECT ?s1 (COUNT(*) AS ?c) WHERE {"
+				Vector<Vector<String[]>> sSingle=query(sib,sparqlPrefix("sr")+"SELECT ?s1 (COUNT(*) AS ?c) WHERE {"
 						+ "sr:"+tID+" sr:seat ?s1, ?s2."	//XXX if there isn't any aggregate function in the SELECT clause, GROUP BY doesn't work
 						+ "?s1 sr:near ?s2}"
 						+ "GROUP BY ?s1 "	//leave space before '"'!!
@@ -100,9 +101,14 @@ public class KPSensorSimulator {
 		query.append("INSERT DATA {");
 		query.append("sr:"+sr.getID()+" rdf:type sr:StudyRoom;");
 		query.append("	sr:hasName \""+sr.getName()+"\";");
+		query.append("	sr:hasCapacity "+sr.getCapacity()+";");
+		query.append("	sr:availableSeats "+sr.getCapacity()+";");
+		query.append("	sr:studyRoomState sr:open;");
 		query.append("	sr:inUniversity sr:"+uid+". ");
-		if (!optUid.isPresent())
-			query.append("sr:"+uid+" sr:hasUniversityID \""+sr.getUniversity()+"\". ");
+		if (!optUid.isPresent()){
+			query.append("sr:"+uid+" rdf:type sr:University;");
+			query.append("	sr:hasUniversityID \""+sr.getUniversity()+"\". ");
+		}
 		for (Table t : sr.getTables()){
 			query.append("sr:"+sr.getID()+" sr:table sr:"+t.getID()+". ");
 			query.append("sr:"+t.getID()+" rdf:type sr:Table. ");
@@ -116,6 +122,7 @@ public class KPSensorSimulator {
 				}
 				query.append("sr:"+t.getID()+" sr:seat sr:"+s.getID()+". ");
 				query.append("sr:"+s.getID()+" rdf:type sr:Seat;");
+				query.append("		sr:seatState sr:available;");
 				query.append("		sr:hasChairSensor sr:"+s.getChairSensorID()+";");
 				query.append("		sr:hasTableSensor sr:"+s.getTableSensorID()+". ");
 				query.append("sr:"+s.getChairSensorID()+" rdf:type sr:ChairSensor;");

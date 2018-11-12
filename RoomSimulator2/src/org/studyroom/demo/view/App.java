@@ -10,6 +10,7 @@ import org.studyroom.view.*;
 public class App extends Application {
 	public static void main(String[] args){
 		launch(args);
+		System.exit(0);
 	}
 
 	@Override

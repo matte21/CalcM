@@ -3,31 +3,15 @@
  */
 package rooms.aggregator.redsib09;
 
-import java.util.Map;
-import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import rooms.aggregator.RoomsAggregator;
-import rooms.aggregator.outcome.EmptyFailure;
-import rooms.aggregator.outcome.EmptyOutcome;
-import rooms.aggregator.outcome.EmptySuccess;
-import rooms.aggregator.redsib09.exceptions.BadExceptionHandlerException;
-import rooms.aggregator.redsib09.exceptions.BadOntologyPrefixException;
-import rooms.aggregator.redsib09.exceptions.BadRoomIDException;
-import rooms.aggregator.redsib09.exceptions.BadSIBIPorHostException;
-import rooms.aggregator.redsib09.exceptions.BadSmartspaceNameException;
-import rooms.aggregator.redsib09.exceptions.FailedToAcquireNbrOfAvailableSeatsException;
-import rooms.aggregator.redsib09.exceptions.FailedToJoinSmartspaceException;
-import rooms.aggregator.redsib09.exceptions.badSIBPortNumberException;
-
-import sofia_kp.KPICore;
-import sofia_kp.SIBResponse;
-import sofia_kp.SSAP_sparql_response;
-import sofia_kp.iKPIC_subscribeHandler2;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import org.apache.logging.log4j.*;
+import org.studyroom.kp.*;
+import rooms.aggregator.*;
+import rooms.aggregator.outcome.*;
+import rooms.aggregator.redsib09.exceptions.*;
+import sofia_kp.*;
 
 /**
  * A thread-safe room aggregator implementation for cases where the rooms are stored as RDF triples in a Red SIB v0.9.
@@ -703,9 +687,8 @@ public class RedSIB09RoomsAggregator implements RoomsAggregator {
 
 		
 		private int computeInitiallyAvailableSeats() throws FailedToAcquireNbrOfAvailableSeatsException {
-			String availSeatsVarName = "availSeats"; 
 			String availSeatsQuery = "PREFIX ns:<" + ontologyPrefix + "> \n" 
-									+ "SELECT (COUNT(?seat) AS ?" + availSeatsVarName + ") \n "
+									+ "SELECT (COUNT(?seat) AS ?availSeats) \n "
 									+ "WHERE { \n" 
 									+ "ns:" + roomID + " ns:table ?table . \n" 
 									+ "?table ns:seat ?seat . \n " 
@@ -732,7 +715,7 @@ public class RedSIB09RoomsAggregator implements RoomsAggregator {
 				throw new FailedToAcquireNbrOfAvailableSeatsException(logMessage.toString());
 			}
 			
-			return Integer.parseInt(resp.sparqlquery_results.getResultsForVar(availSeatsVarName).firstElement()[2]);
+			return SIBUtils.getInt(resp.sparqlquery_results.getResults().firstElement(),0);
 		}
 
 
@@ -767,12 +750,16 @@ public class RedSIB09RoomsAggregator implements RoomsAggregator {
 		
 		private String buildSubQuery() {
 			return "PREFIX ns:<" + ontologyPrefix + "> \n"
-				 + "SELECT ?seat \n"
+				 + "SELECT ?seat ?chairState ?tableState \n"
 				 + "WHERE { \n"
-				 + "ns:" + roomID + " ns:table " + "?table . \n"
-				 + "?table ns:seat ?seat . \n"
-				 + "?seat ns:seatState ?state \n" 
-				 + "FILTER(?state = ns:available) \n"
+				 + "ns:" + roomID + " ns:table " + "?table. \n"
+				 + "?table ns:seat ?seat. \n"
+				 + "?seat ns:hasChairSensor ?cs; \n" 
+				 + "	  ns:hasTableSensor ?ts. \n" 
+				 + "?cs ns:hasValue ?chairState. \n" 
+				 + "?ts ns:hasValue ?tableState. \n" 
+				 + "FILTER(?chairState = ns:nothingDetected) \n"
+				 + "FILTER(?tableState = ns:nothingDetected) \n"
 				 + "}";
 		}
 
@@ -906,8 +893,8 @@ public class RedSIB09RoomsAggregator implements RoomsAggregator {
 			LOG.info(logMessage.toString());
 			
 			// Build SPARQL update
-			updateSeatsNbr(newResults, oldResults);
-			String sparqlUpdate = buildSPARQLUpdate(availableSeats);
+			Map<String, Boolean> changes = updateSeats(newResults, oldResults);
+			String sparqlUpdate = buildSPARQLUpdate(availableSeats, changes);
 			
 			// Perform the update
 			SIBResponse resp = sib.update_sparql(sparqlUpdate);
@@ -944,28 +931,38 @@ public class RedSIB09RoomsAggregator implements RoomsAggregator {
 		}
 		
 		
-		private void updateSeatsNbr(SSAP_sparql_response newResults, SSAP_sparql_response oldResults) {
+		private Map<String, Boolean> updateSeats(SSAP_sparql_response newResults, SSAP_sparql_response oldResults) {
+			Map<String, Boolean> m=new TreeMap<>();
 			if (newResults != null) {
+				for (String[] result : newResults.getResultsForVar("seat"))
+					m.put(SIBUtils.getID(result),true);
 				availableSeats += newResults.resultsNumber();
 			}
 			
 			if (oldResults != null) {
+				for (String[] result : oldResults.getResultsForVar("seat"))
+					m.put(SIBUtils.getID(result),false);
 				availableSeats -= oldResults.resultsNumber();
 			}
+			return m;
 		}
 
 
-		private String buildSPARQLUpdate(int availableSeats) {
-			return "PREFIX ns:<" + ontologyPrefix + "> \n"
+		private String buildSPARQLUpdate(int availableSeats, Map<String, Boolean> changes) {
+			StringBuilder query=new StringBuilder("PREFIX ns:<" + ontologyPrefix + "> \n"
 				 + "DELETE { \n"
-				 + "ns:" + roomID + " ns:availableSeats " + "?staleAvailableSeats \n"
-				 + "} \n"
+				 + "ns:" + roomID + " ns:availableSeats " + "?staleAvailableSeats. \n");
+			changes.forEach((seat,available)->query.append("ns:" + seat + " ns:seatState ?staleState. \n"));
+			query.append("} \n"
 				 + "INSERT { \n"
-				 + "ns:" + roomID + " ns:availableSeats " + availableSeats + "\n"
-				 + "}"
+				 + "ns:" + roomID + " ns:availableSeats " + availableSeats + ". \n");
+			changes.forEach((seat,available)->query.append("ns:" + seat + " ns:seatState ns:" + (available?"available":"occupied") + ". \n"));
+			query.append("}"
 				 + "WHERE { \n"
-				 + "ns:" + roomID + " ns:availableSeats " + "?staleAvailableSeats \n"
-				 + "}";
+				 + "ns:" + roomID + " ns:availableSeats " + "?staleAvailableSeats. \n");
+			changes.forEach((seat,available)->query.append("ns:" + seat + " ns:seatState ?staleState. \n"));
+			query.append("}");
+			return query.toString();
 		}
 
 		

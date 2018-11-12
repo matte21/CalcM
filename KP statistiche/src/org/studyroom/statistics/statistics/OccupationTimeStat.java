@@ -54,7 +54,6 @@ public class OccupationTimeStat extends RealTimeStatistic {
 	}
 	@Override
 	protected void loadStatisticData(Map<String,Map<String,String>> data){
-		System.out.println(data);
 		data.forEach((sr,m)->{
 			List<SeatOccupation> l=val.get(sr);
 			if (l!=null)
@@ -63,7 +62,6 @@ public class OccupationTimeStat extends RealTimeStatistic {
 			else
 				System.err.println(getName()+": unknown room \""+sr+"\" in data file");
 		});
-		System.out.println(val);
 	}
 	@Override
 	protected Map<String,Map<String,String>> saveStatisticData(){

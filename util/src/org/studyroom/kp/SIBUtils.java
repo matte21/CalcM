@@ -179,14 +179,29 @@ public class SIBUtils {
 		return removeNS(SSAP_sparql_response.getCellValue(result.get(pos)));
 	}
 	
+	/**@return the ID of the URI at position {@code pos} of a query result */
+	public static String getID(String[] resultForVar){
+		return removeNS(SSAP_sparql_response.getCellValue(resultForVar));
+	}
+	
 	/**@return the value at position {@code pos} of a query result */
 	public static String getString(List<String[]> result, int pos){
 		return decodeXMLChars(SSAP_sparql_response.getCellValue(result.get(pos)));
 	}
 	
 	/**@return the value at position {@code pos} of a query result */
+	public static String getString(String[] resultForVar){
+		return decodeXMLChars(SSAP_sparql_response.getCellValue(resultForVar));
+	}
+	
+	/**@return the value at position {@code pos} of a query result */
 	public static int getInt(List<String[]> result, int pos){
-		return Integer.parseInt(decodeXMLChars(SSAP_sparql_response.getCellValue(result.get(pos))));
+		return Integer.parseInt(SSAP_sparql_response.getCellValue(result.get(pos)));
+	}
+	
+	/**@return the value at position {@code pos} of a query result */
+	public static int getInt(String[] resultForVar){
+		return Integer.parseInt(SSAP_sparql_response.getCellValue(resultForVar));
 	}
 	
 	/**Removes the namespace from the URI */

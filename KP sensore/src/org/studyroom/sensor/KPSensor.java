@@ -31,14 +31,11 @@ public abstract class KPSensor implements Observer {
 	public void update(Observable o, Object e){
 		Sensor s=(Sensor)o;
 		//SIBResponse r=sib.update(id,getPredicate(),getNS("sr")+(s.isOn()?"somethingDetected":"nothingDetected"),"URI","URI",id,getPredicate(),SSAP_XMLTools.ANYURI,"URI","URI");
-		SIBResponse r=sib.querySPARQL(sparqlPrefix("sr")+"INSERT DATA {sr:"+id+" sr:hasValue sr:"+(s.isOn()?"somethingDetected":"nothingDetected")+"}");
+		SIBResponse r=sib.querySPARQL(sparqlPrefix("sr")+
+				"DELETE DATA {sr:"+id+" sr:hasValue sr:"+(s.isOn()?"nothingDetected":"somethingDetected")+"}\n"+
+				"INSERT DATA {sr:"+id+" sr:hasValue sr:"+(s.isOn()?"somethingDetected":"nothingDetected")+"}");
 		if (!r.isConfirmed()){
 			System.err.println("Sensor "+id+": update refused ("+r.Status+")");
-			return;
-		}
-		r=sib.querySPARQL(sparqlPrefix("sr")+"DELETE DATA {sr:"+id+" sr:hasValue sr:"+(s.isOn()?"nothingDetected":"somethingDetected")+"}");
-		if (!r.isConfirmed()){
-			System.err.println("Sensor "+id+": inconsistent state: remove refused ("+r.Status+")");
 			return;
 		}
 	}
