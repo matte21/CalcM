@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JPopupMenu.Separator;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -36,7 +38,14 @@ public class IndexHandler extends SIBFacingHandler {
 	// its execution environment, which might change in the future. It should be the opposite: the src code
 	// should make an assumption on how the files will be organized in its execution environment, and the
 	// build/deploy scripts should make those assumptions true. Currently the opposite is happening. 
-	private final static String HTML_TEMPLATE_PATH = "queryWebServer/src/main/resources/indexTemplate.html";
+	private final static String SEPARATOR = System.getProperty("file.separator");
+	private final static String HTML_TEMPLATE_PATH = ".." + SEPARATOR 
+			                                         + SEPARATOR + "QueryWebServer"
+			                                         + SEPARATOR + "src" 
+			                                         + SEPARATOR + "main" 
+			                                         + SEPARATOR + "resources" 
+			                                         + SEPARATOR + "indexTemplate.html";
+	
 	private final static String OPEN_ROOMS_DISPLAYER_ID = "open_rooms_table";
 	private final static String CLOSED_ROOMS_DISPLAYER_ID = "closed_rooms_table";
 	
